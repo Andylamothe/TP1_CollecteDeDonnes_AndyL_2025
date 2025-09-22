@@ -26,7 +26,9 @@ const app = express();
 
 app.get('/users', (req, res) => {
     res.json([
-      { id: 1, name: 'John Doe' },
+      { id: 1, name: 'Jack Baka' },
       { id: 2, name: 'Jane Doe' },
     ]);
   });
+
+export default app;

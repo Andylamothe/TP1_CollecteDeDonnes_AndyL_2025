@@ -1,7 +1,8 @@
 import express, {Request, Response} from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-
+import users from './routes/users';
+import usersID from './routes/usersId';
 const app = express();
 
 // Définir les options de Swagger
@@ -25,18 +26,20 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Autres routes et middleware Express
 app.use(express.json());
+app.use(users)
+app.use(usersID)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, TypeScript with Express! Connexion sécurisée.');
 });
 
 // Exemple de route
-app.get('/users', (req, res) => {
-  res.json([
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Doe' },
-  ]);
-});
+// app.get('/users', (req, res) => {
+//   res.json([
+//     { id: 1, name: 'John Doe' },
+//     { id: 2, name: 'Jane Doe' },
+//   ]);
+// });
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3000;
