@@ -23,6 +23,7 @@ const app = express();
  *                     type: string
  *                     example: John Doe
  */
+
 app.get('/users', (req, res) => {
     res.json([
       { id: 1, name: 'John Doe' },
