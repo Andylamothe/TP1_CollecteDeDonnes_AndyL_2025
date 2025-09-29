@@ -1,13 +1,14 @@
 import { Media } from "./Media";
 
 export class Film extends Media {
+    duree: number;
+    genre: string;
+    annee: number;
 
-    duration:number;
-    watched:boolean;
-
-    constructor( id:string,title:string,genre:string,year:number,rating:number,duration:number,watched:boolean){
-        super(id,title,genre,year,rating);
-        this.duration = duration;
-        this.watched = watched;
+    constructor(id: string, titre: string, plateforme: string, userId: string, duree: number, genre: string, annee: number) {
+        super(id, titre, plateforme, userId, "film");
+        this.duree = duree;
+        this.genre = genre;
+        this.annee = annee;
     }
 }

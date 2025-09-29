@@ -1,11 +1,13 @@
 import { Media } from "./Media";
+import { Saison } from "./Saison";
 
 export class Serie extends Media {
+    statut: "en_attente" | "en_cours" | "terminee";
+    saisons: Saison[];
 
-    status:"En cours"|"Terminée";
-    
-    constructor( id:string,title:string,genre:string,year:number,rating:number,status:"En cours"|"Terminée"){
-        super(id,title,genre,year,rating);
-        this.status = status;
+    constructor(id: string, titre: string, plateforme: string, userId: string, statut: "en_attente" | "en_cours" | "terminee", saisons: Saison[] = []) {
+        super(id, titre, plateforme, userId, "serie");
+        this.statut = statut;
+        this.saisons = saisons;
     }
 }

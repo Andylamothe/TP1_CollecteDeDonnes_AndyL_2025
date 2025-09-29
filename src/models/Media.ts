@@ -1,18 +1,15 @@
-export abstract class Media{
+export abstract class Media {
+    id: string;
+    titre: string;
+    plateforme: string;
+    userId: string;
+    type: "film" | "serie";
 
-    id:string;
-    title:string;
-    genre:string;
-    year:number;
-    rating:number;
-
-
-    constructor( id:string,title:string,genre:string,year:number,rating:number){
+    constructor(id: string, titre: string, plateforme: string, userId: string, type: "film" | "serie") {
         this.id = id;
-        this.title = title;
-        this.genre = genre;
-        this.year = year;
-        this.rating = rating;
+        this.titre = titre;
+        this.plateforme = plateforme;
+        this.userId = userId;
+        this.type = type;
     }
-
 }

@@ -1,16 +1,18 @@
 
 export class Episode {
     id: string;
-    title: string;
-    duration: number;
-    episodeNumber: number;
-    watched: boolean;
+    titre: string;
+    numero: number;
+    duree: number;
+    watched?: boolean;
 
-    constructor(id: string,title: string,duration: number,episodeNumber: number,watched: boolean,) {
+    constructor(id: string, titre: string, numero: number, duree: number, watched?: boolean) {
         this.id = id;
-        this.title = title;
-        this.duration = duration;
-        this.episodeNumber = episodeNumber;
-        this.watched = watched;
+        this.titre = titre;
+        this.numero = numero;
+        this.duree = duree;
+        if (watched !== undefined) {
+            this.watched = watched;
+        }
     }
 }

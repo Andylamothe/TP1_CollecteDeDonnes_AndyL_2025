@@ -1,20 +1,11 @@
-import { Media } from "./Media";
+export class User {
+    id: string;
+    nom: string;
+    role: "admin" | "user";
 
-export class User{
-
-    id:string;
-    email:string;
-    password:string;
-    role:"admin" | "user";
-    favorites:Media[];
-
-    constructor(id:string, email:string,password:string, role:"admin" | "user",favorites:Media[]){
+    constructor(id: string, nom: string, role: "admin" | "user") {
         this.id = id;
-        this.email = email;
-        this.password = password;
+        this.nom = nom;
         this.role = role;
-        this.favorites = favorites;
     }
-    
-
 }
