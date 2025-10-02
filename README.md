@@ -12,7 +12,7 @@ Ce projet implémente une API RESTful complète en TypeScript avec Node.js et Ex
 ### Installation
 ```bash
 # Cloner le repository
-git clone <votre-repo-github>
+git clone https://github.com/Andylamothe/TP1_CollecteDeDonnes_AndyL_2025
 cd TP1_CollecteDeDonnes_AndyL_2025
 
 # Installer les dépendances
