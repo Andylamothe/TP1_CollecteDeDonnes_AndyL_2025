@@ -1,12 +1,12 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import helmet from 'helmet';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import dotenv from 'dotenv';
+import * as express from 'express';
+import * as mongoose from 'mongoose';
+import * as cors from 'cors';
+import * as helmet from 'helmet';
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+import * as swaggerJsdoc from 'swagger-jsdoc';
+import * as swaggerUi from 'swagger-ui-express';
+import * as dotenv from 'dotenv';
 
 // Charger les variables d'environnement
 dotenv.config({ path: './env.local' });
@@ -14,7 +14,7 @@ dotenv.config({ path: './env.local' });
 const app = express();
 
 // Middlewares de sécurité
-app.use(helmet());
+app.use(helmet.default());
 app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true
@@ -46,7 +46,7 @@ const swaggerOptions = {
             }
         }
     },
-    apis: ['./server-simple.ts']
+    apis: ['./server-fixed.ts']
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -92,13 +92,8 @@ interface AuthenticatedUser {
     role: string;
 }
 
-// Interface pour la requête avec utilisateur authentifié
-interface AuthenticatedRequest extends express.Request {
-    user: AuthenticatedUser;
-}
-
 // Middleware d'authentification
-const authenticateToken = (req: AuthenticatedRequest, res: express.Response, next: express.NextFunction): void => {
+const authenticateToken = (req: any, res: any, next: any): void => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -142,45 +137,14 @@ app.get('/health', (req, res) => {
     });
 });
 
-/**
- * @swagger
- * /api/v2/auth/register:
- *   post:
- *     summary: Inscription d'un nouvel utilisateur
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - username
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: user@example.com
- *               username:
- *                 type: string
- *                 example: john_doe
- *               password:
- *                 type: string
- *                 example: password123
- *     responses:
- *       201:
- *         description: Utilisateur créé avec succès
- *       400:
- *         description: Données invalides
- */
+// Routes d'authentification
 app.post('/api/v2/auth/register', async (req, res) => {
     try {
         const { email, username, password } = req.body;
         
         if (!email || !username || !password) {
-            return res.status(400).json({ message: 'Email, nom d\'utilisateur et mot de passe sont requis' });
+            res.status(400).json({ message: 'Email, nom d\'utilisateur et mot de passe sont requis' });
+            return;
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -214,51 +178,25 @@ app.post('/api/v2/auth/register', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /api/v2/auth/login:
- *   post:
- *     summary: Connexion d'un utilisateur
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: user@example.com
- *               password:
- *                 type: string
- *                 example: password123
- *     responses:
- *       200:
- *         description: Connexion réussie
- *       401:
- *         description: Identifiants incorrects
- */
 app.post('/api/v2/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
         if (!email || !password) {
-            return res.status(400).json({ message: 'Email et mot de passe sont requis' });
+            res.status(400).json({ message: 'Email et mot de passe sont requis' });
+            return;
         }
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+            res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+            return;
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+            res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+            return;
         }
 
         const token = jwt.sign(
@@ -282,21 +220,7 @@ app.post('/api/v2/auth/login', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /api/v2/auth/me:
- *   get:
- *     summary: Récupérer le profil de l'utilisateur connecté
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Profil récupéré avec succès
- *       401:
- *         description: Non authentifié
- */
-app.get('/api/v2/auth/me', authenticateToken, async (req: AuthenticatedRequest, res: express.Response) => {
+app.get('/api/v2/auth/me', authenticateToken, async (req: any, res) => {
     try {
         const user = await User.findById(req.user.userId);
         if (!user) {
@@ -318,16 +242,7 @@ app.get('/api/v2/auth/me', authenticateToken, async (req: AuthenticatedRequest, 
     }
 });
 
-/**
- * @swagger
- * /api/v2/movies:
- *   get:
- *     summary: Récupérer la liste des films
- *     tags: [Movies]
- *     responses:
- *       200:
- *         description: Liste des films récupérée avec succès
- */
+// Routes des films
 app.get('/api/v2/movies', async (req, res) => {
     try {
         const movies = await Movie.find().limit(10);
@@ -340,25 +255,6 @@ app.get('/api/v2/movies', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /api/v2/movies/{id}:
- *   get:
- *     summary: Récupérer un film par son ID
- *     tags: [Movies]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID du film
- *     responses:
- *       200:
- *         description: Film récupéré avec succès
- *       404:
- *         description: Film non trouvé
- */
 app.get('/api/v2/movies/:id', async (req, res) => {
     try {
         const movie = await Movie.findById(req.params.id);
@@ -375,50 +271,7 @@ app.get('/api/v2/movies/:id', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /api/v2/movies:
- *   post:
- *     summary: Créer un nouveau film (Admin uniquement)
- *     tags: [Movies]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - title
- *               - genres
- *               - durationMin
- *             properties:
- *               title:
- *                 type: string
- *                 example: "Inception"
- *               genres:
- *                 type: array
- *                 items:
- *                   type: string
- *                 example: ["Action", "Sci-Fi"]
- *               synopsis:
- *                 type: string
- *                 example: "Un voleur qui entre dans les rêves..."
- *               releaseDate:
- *                 type: string
- *                 format: date
- *                 example: "2010-07-16"
- *               durationMin:
- *                 type: integer
- *                 example: 148
- *     responses:
- *       201:
- *         description: Film créé avec succès
- *       403:
- *         description: Permissions insuffisantes
- */
-app.post('/api/v2/movies', authenticateToken, async (req: AuthenticatedRequest, res: express.Response) => {
+app.post('/api/v2/movies', authenticateToken, async (req: any, res) => {
     try {
         if (req.user.role !== 'admin') {
             res.status(403).json({ message: 'Permissions insuffisantes' });
@@ -445,47 +298,8 @@ app.post('/api/v2/movies', authenticateToken, async (req: AuthenticatedRequest, 
     }
 });
 
-/**
- * @swagger
- * /api/v2/ratings:
- *   post:
- *     summary: Créer une nouvelle note
- *     tags: [Ratings]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - target
- *               - targetId
- *               - score
- *             properties:
- *               target:
- *                 type: string
- *                 enum: [movie, series]
- *                 example: "movie"
- *               targetId:
- *                 type: string
- *                 example: "507f1f77bcf86cd799439011"
- *               score:
- *                 type: integer
- *                 minimum: 1
- *                 maximum: 10
- *                 example: 8
- *               review:
- *                 type: string
- *                 example: "Excellent film !"
- *     responses:
- *       201:
- *         description: Note créée avec succès
- *       401:
- *         description: Non authentifié
- */
-app.post('/api/v2/ratings', authenticateToken, async (req: AuthenticatedRequest, res: express.Response) => {
+// Routes des notes
+app.post('/api/v2/ratings', authenticateToken, async (req: any, res) => {
     try {
         const { target, targetId, score, review } = req.body;
         
@@ -508,21 +322,7 @@ app.post('/api/v2/ratings', authenticateToken, async (req: AuthenticatedRequest,
     }
 });
 
-/**
- * @swagger
- * /api/v2/ratings/my:
- *   get:
- *     summary: Récupérer les notes de l'utilisateur connecté
- *     tags: [Ratings]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Notes récupérées avec succès
- *       401:
- *         description: Non authentifié
- */
-app.get('/api/v2/ratings/my', authenticateToken, async (req: AuthenticatedRequest, res: express.Response) => {
+app.get('/api/v2/ratings/my', authenticateToken, async (req: any, res) => {
     try {
         const ratings = await Rating.find({ userId: req.user.userId });
         res.json({
@@ -568,6 +368,7 @@ async function startServer() {
             console.log(`   POST /api/v2/auth/login     - Connexion`);
             console.log(`   GET  /api/v2/auth/me        - Profil (JWT requis)`);
             console.log(`   GET  /api/v2/movies         - Liste des films`);
+            console.log(`   GET  /api/v2/movies/:id     - Film par ID`);
             console.log(`   POST /api/v2/movies         - Créer un film (Admin, JWT requis)`);
             console.log(`   POST /api/v2/ratings        - Créer une note (JWT requis)`);
             console.log(`   GET  /api/v2/ratings/my     - Mes notes (JWT requis)`);

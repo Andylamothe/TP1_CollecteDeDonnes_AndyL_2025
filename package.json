@@ -16,7 +16,7 @@
     "license": "ISC",
     "scripts": {
         "start": "ts-node-dev --respawn server.ts",
-        "dev": "ts-node-dev --respawn server-simple.ts",
+        "dev": "node server-working.js",
         "test": "NODE_ENV=test ts-node-dev --respawn server.ts",
         "prod": "NODE_ENV=production node dist/server.js",
         "build": "tsc",
@@ -37,6 +37,7 @@
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
         "@types/uuid": "^10.0.0",
+        "axios": "^1.12.2",
         "bcryptjs": "^2.4.3",
         "config": "^3.3.9",
         "cors": "^2.8.5",

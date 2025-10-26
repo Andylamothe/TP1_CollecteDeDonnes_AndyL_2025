@@ -48,25 +48,39 @@ const sampleUsers = [
 
 const sampleMovies = [
     {
-        title: 'Inception',
-        genres: ['Action', 'Sci-Fi', 'Thriller'],
-        synopsis: 'Un voleur qui entre dans les rêves des gens pour voler leurs secrets.',
-        releaseDate: new Date('2010-07-16'),
-        durationMin: 148
+        title: 'Avatar',
+        genres: ['Action', 'Adventure', 'Fantasy'],
+        synopsis: 'Un marine paraplégique envoyé sur une lune lointaine pour extraire un minerai précieux.',
+        releaseDate: new Date('2009-12-18'),
+        durationMin: 162
     },
     {
-        title: 'The Dark Knight',
-        genres: ['Action', 'Crime', 'Drama'],
-        synopsis: 'Batman doit affronter le Joker, un criminel psychotique.',
-        releaseDate: new Date('2008-07-18'),
-        durationMin: 152
+        title: 'Interstellar',
+        genres: ['Adventure', 'Drama', 'Sci-Fi'],
+        synopsis: 'Un groupe d\'astronautes voyage à travers un trou de ver dans l\'espace.',
+        releaseDate: new Date('2014-11-07'),
+        durationMin: 169
     },
     {
-        title: 'Pulp Fiction',
-        genres: ['Crime', 'Drama'],
-        synopsis: 'Les histoires entrelacées de plusieurs personnages dans le monde du crime.',
-        releaseDate: new Date('1994-10-14'),
-        durationMin: 154
+        title: 'The Matrix',
+        genres: ['Action', 'Sci-Fi'],
+        synopsis: 'Un programmeur informatique découvre que la réalité est une simulation.',
+        releaseDate: new Date('1999-03-31'),
+        durationMin: 136
+    },
+    {
+        title: 'Forrest Gump',
+        genres: ['Drama', 'Romance'],
+        synopsis: 'L\'histoire d\'un homme simple qui vit des événements historiques majeurs.',
+        releaseDate: new Date('1994-07-06'),
+        durationMin: 142
+    },
+    {
+        title: 'The Lord of the Rings: The Fellowship of the Ring',
+        genres: ['Adventure', 'Drama', 'Fantasy'],
+        synopsis: 'Un hobbit entreprend un voyage épique pour détruire un anneau magique.',
+        releaseDate: new Date('2001-12-19'),
+        durationMin: 178
     }
 ];
 
@@ -116,35 +130,70 @@ async function seedDatabase() {
                 target: 'movie',
                 targetId: movies[0]._id,
                 score: 9,
-                review: 'Excellent film, très original !'
+                review: 'Avatar - Visuellement époustouflant !'
             },
             {
                 userId: users[1]._id,
                 target: 'movie',
                 targetId: movies[0]._id,
                 score: 8,
-                review: 'Très bon, mais un peu complexe.'
+                review: 'Avatar - Très bon film, effets spéciaux incroyables.'
             },
             {
                 userId: users[0]._id,
                 target: 'movie',
                 targetId: movies[1]._id,
                 score: 10,
-                review: 'Chef-d\'œuvre absolu !'
+                review: 'Interstellar - Chef-d\'œuvre de Nolan !'
             },
             {
                 userId: users[1]._id,
                 target: 'movie',
                 targetId: movies[1]._id,
                 score: 9,
-                review: 'Heath Ledger était incroyable.'
+                review: 'Interstellar - Science-fiction brillante.'
             },
             {
                 userId: users[0]._id,
                 target: 'movie',
                 targetId: movies[2]._id,
+                score: 10,
+                review: 'The Matrix - Révolutionnaire !'
+            },
+            {
+                userId: users[1]._id,
+                target: 'movie',
+                targetId: movies[2]._id,
+                score: 9,
+                review: 'The Matrix - Classique de la science-fiction.'
+            },
+            {
+                userId: users[0]._id,
+                target: 'movie',
+                targetId: movies[3]._id,
                 score: 8,
-                review: 'Classique du cinéma.'
+                review: 'Forrest Gump - Touchant et inspirant.'
+            },
+            {
+                userId: users[1]._id,
+                target: 'movie',
+                targetId: movies[3]._id,
+                score: 7,
+                review: 'Forrest Gump - Bon film, un peu long.'
+            },
+            {
+                userId: users[0]._id,
+                target: 'movie',
+                targetId: movies[4]._id,
+                score: 10,
+                review: 'Le Seigneur des Anneaux - Épique et magnifique !'
+            },
+            {
+                userId: users[1]._id,
+                target: 'movie',
+                targetId: movies[4]._id,
+                score: 9,
+                review: 'Le Seigneur des Anneaux - Fantasy parfaite.'
             }
         ];
 
