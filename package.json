@@ -20,7 +20,7 @@
         "test": "NODE_ENV=test ts-node-dev --respawn server.ts",
         "prod": "NODE_ENV=production node dist/server.js",
         "build": "tsc",
-        "seed": "node seed-simple.js",
+        "seed": "npx ts-node seed-simple.ts",
         "test:typescript": "ts-node test-typescript.ts",
         "install:v1": "cd v1 && npm install",
         "install:v2": "cd v2 && npm install",

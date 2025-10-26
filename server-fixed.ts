@@ -1,24 +1,20 @@
-import * as express from 'express';
+import express from 'express';
 import * as mongoose from 'mongoose';
-import * as cors from 'cors';
-import * as helmet from 'helmet';
+import cors from 'cors';
+import helmet from 'helmet';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import * as swaggerJsdoc from 'swagger-jsdoc';
+import swaggerJsdoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import * as dotenv from 'dotenv';
 
 // Charger les variables d'environnement
 dotenv.config({ path: './env.local' });
-
 const app = express();
 
-// Middlewares de sécurité
-app.use(helmet.default());
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    credentials: true
-}));
+// middlewares
+app.use(helmet());
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
 // Configuration Swagger
@@ -344,7 +340,8 @@ async function connectToMongoDB() {
             socketTimeoutMS: 45000,
         });
         console.log('✅ Connexion à MongoDB Atlas réussie !');
-        console.log('📊 Base de données:', mongoose.connection.name);
+        const dbName = mongoose.connection?.db?.databaseName || '(inconnue)';
+        console.log('📊 Base de données:', dbName);
     } catch (error: any) {
         console.error('❌ Erreur de connexion MongoDB:', error.message);
         process.exit(1);
@@ -359,11 +356,11 @@ async function startServer() {
         await connectToMongoDB();
         
         app.listen(PORT, () => {
-            console.log(`🚀 Serveur TV Tracker v2 TypeScript démarré sur le port ${PORT}`);
-            console.log(`📖 API disponible sur http://localhost:${PORT}`);
-            console.log(`📚 Documentation Swagger: http://localhost:${PORT}/docs`);
-            console.log(`🔧 Environnement: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`\n🎯 Endpoints disponibles :`);
+            console.log(` Serveur TV Tracker v2 TypeScript démarré sur le port ${PORT}`);
+            console.log(` API disponible sur http://localhost:${PORT}`);
+            console.log(` Documentation Swagger: http://localhost:${PORT}/docs`);
+            console.log(` Environnement: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`\n Endpoints disponibles :`);
             console.log(`   POST /api/v2/auth/register  - Inscription`);
             console.log(`   POST /api/v2/auth/login     - Connexion`);
             console.log(`   GET  /api/v2/auth/me        - Profil (JWT requis)`);
