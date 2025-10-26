@@ -6,21 +6,28 @@ API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JW
 
 
 # 1. Installation des dépendances
+```bash
 npm run install:all
-
+```
 # 2. Configuration de l'environnement
+```bash
 cp v2/env.example .env
+```
 # Éditer .env avec vos valeurs MongoDB
 
 # 3. Démarrage du serveur TypeScript
+```bash
 npm run dev
+```
 # Cloner le repository
+```bash
 git clone https://github.com/Andylamothe/TP1_CollecteDeDonnes_AndyL_2025
 cd TP1_CollecteDeDonnes_AndyL_2025
-
+```
 # 4. Peupler la base de données
+```bash
 npm run seed
-
+```
 # 5. Accès à l'API
 # API: http://localhost:3000
 # Swagger: http://localhost:3000/docs
@@ -53,15 +60,19 @@ npm run --silent
 ```bash
 # Démarrer le serveur
 npm run dev
-
+```
 # Tester l'accès Swagger
+```
 curl http://localhost:3000/docs
+```
 # Doit retourner du HTML Swagger UI
 
 # Tester l'API de santé
-curl http://localhost:3000/health
-# Doit retourner {"status":"ok","database":"connected"}
 ```
+curl http://localhost:3000/health
+```
+# Doit retourner {"status":"ok","database":"connected"}
+
 
 ### ✅ **3. MongoDB - Schémas et Connexion**
 - **Modèles** : `v2/src/models/` (User, Movie, Series, Season, Episode, Rating)
@@ -73,6 +84,7 @@ curl http://localhost:3000/health
 ```bash
 # Exécuter le seed
 npm run seed
+
 # Doit afficher "✅ Base de données peuplée avec succès"
 
 # Vérifier la connexion
