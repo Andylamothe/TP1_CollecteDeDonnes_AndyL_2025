@@ -4,7 +4,7 @@ API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JW
 
 ## 🚀 Démarrage Rapide
 
-```bash
+
 # 1. Installation des dépendances
 npm run install:all
 
@@ -14,6 +14,9 @@ cp v2/env.example .env
 
 # 3. Démarrage du serveur TypeScript
 npm run dev
+# Cloner le repository
+git clone https://github.com/Andylamothe/TP1_CollecteDeDonnes_AndyL_2025
+cd TP1_CollecteDeDonnes_AndyL_2025
 
 # 4. Peupler la base de données
 npm run seed
@@ -22,7 +25,7 @@ npm run seed
 # API: http://localhost:3000
 # Swagger: http://localhost:3000/docs
 # Santé: http://localhost:3000/health
-```
+
 
 ## 📊 Vérification des Livrables
 
@@ -350,3 +353,6 @@ npm run install:all
 - ✅ Sécurité complète
 - ✅ Scripts de seed fonctionnels
 - ✅ Configuration multi-environnement
+
+
+Ce projet est développé dans le cadre académique du cours de Collecte et Interprétation des Données.
