@@ -1,0 +1,454 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TV Tracker API v2",
+        "version": "2.0.0",
+        "description": "API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT et Swagger",
+        "contact": {
+            "name": "Andy L",
+            "email": "andy@example.com"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Serveur de développement"
+        },
+        {
+            "url": "https://api.tvtracker.com",
+            "description": "Serveur de production"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Informations sur l'API",
+                "description": "Retourne les informations générales sur l'API v2",
+                "tags": ["General"],
+                "responses": {
+                    "200": {
+                        "description": "Informations récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "version": { "type": "string" },
+                                        "environment": { "type": "string" },
+                                        "endpoints": { "type": "object" },
+                                        "features": { "type": "array", "items": { "type": "string" } }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "État de santé de l'API",
+                "description": "Vérifie l'état de santé de l'API et de la base de données",
+                "tags": ["General"],
+                "responses": {
+                    "200": {
+                        "description": "API en bonne santé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": { "type": "string" },
+                                        "timestamp": { "type": "string" },
+                                        "database": { "type": "string" },
+                                        "environment": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/auth/register": {
+            "post": {
+                "summary": "Inscription d'un nouvel utilisateur",
+                "description": "Crée un nouveau compte utilisateur",
+                "tags": ["Authentication"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email", "username", "password"],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "minLength": 3,
+                                        "maxLength": 30,
+                                        "example": "john_doe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "example": "password123"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "user": { "$ref": "#/components/schemas/User" },
+                                        "token": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Utilisateur déjà existant",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/auth/login": {
+            "post": {
+                "summary": "Connexion d'un utilisateur",
+                "description": "Authentifie un utilisateur et retourne un token JWT",
+                "tags": ["Authentication"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email", "password"],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "user": { "$ref": "#/components/schemas/User" },
+                                        "token": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants incorrects",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/movies": {
+            "get": {
+                "summary": "Récupérer la liste des films",
+                "description": "Récupère la liste des films avec filtres et pagination",
+                "tags": ["Movies"],
+                "parameters": [
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "description": "Recherche par titre",
+                        "schema": { "type": "string" }
+                    },
+                    {
+                        "name": "genre",
+                        "in": "query",
+                        "description": "Filtrer par genre",
+                        "schema": { "type": "string" }
+                    },
+                    {
+                        "name": "minYear",
+                        "in": "query",
+                        "description": "Année minimale",
+                        "schema": { "type": "integer" }
+                    },
+                    {
+                        "name": "maxYear",
+                        "in": "query",
+                        "description": "Année maximale",
+                        "schema": { "type": "integer" }
+                    },
+                    {
+                        "name": "minDuration",
+                        "in": "query",
+                        "description": "Durée minimale en minutes",
+                        "schema": { "type": "integer" }
+                    },
+                    {
+                        "name": "maxDuration",
+                        "in": "query",
+                        "description": "Durée maximale en minutes",
+                        "schema": { "type": "integer" }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de page",
+                        "schema": { "type": "integer", "default": 1 }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page",
+                        "schema": { "type": "integer", "default": 10 }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des films récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": {
+                                            "type": "array",
+                                            "items": { "$ref": "#/components/schemas/Movie" }
+                                        },
+                                        "pagination": { "$ref": "#/components/schemas/Pagination" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Créer un nouveau film",
+                "description": "Crée un nouveau film (Admin uniquement)",
+                "tags": ["Movies"],
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["title", "genres", "durationMin"],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Inception"
+                                    },
+                                    "genres": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "example": ["Action", "Sci-Fi"]
+                                    },
+                                    "synopsis": {
+                                        "type": "string",
+                                        "example": "Un voleur qui entre dans les rêves..."
+                                    },
+                                    "releaseDate": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2010-07-16"
+                                    },
+                                    "durationMin": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 600,
+                                        "example": 148
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Film créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": { "$ref": "#/components/schemas/Movie" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions insuffisantes",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "username": { "type": "string" },
+                    "role": { "type": "string", "enum": ["admin", "user"] },
+                    "favorites": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                }
+            },
+            "Movie": {
+                "type": "object",
+                "properties": {
+                    "_id": { "type": "string" },
+                    "title": { "type": "string" },
+                    "genres": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                    },
+                    "synopsis": { "type": "string" },
+                    "releaseDate": { "type": "string", "format": "date" },
+                    "durationMin": { "type": "integer" },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                }
+            },
+            "Rating": {
+                "type": "object",
+                "properties": {
+                    "_id": { "type": "string" },
+                    "userId": { "type": "string" },
+                    "target": { "type": "string", "enum": ["movie", "series"] },
+                    "targetId": { "type": "string" },
+                    "score": { "type": "integer", "minimum": 1, "maximum": 10 },
+                    "review": { "type": "string" },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                }
+            },
+            "Pagination": {
+                "type": "object",
+                "properties": {
+                    "page": { "type": "integer" },
+                    "limit": { "type": "integer" },
+                    "total": { "type": "integer" },
+                    "pages": { "type": "integer" }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "message": { "type": "string" },
+                    "code": { "type": "string" },
+                    "details": { "type": "object" },
+                    "timestamp": { "type": "string", "format": "date-time" }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "General",
+            "description": "Endpoints généraux"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentification et gestion des utilisateurs"
+        },
+        {
+            "name": "Movies",
+            "description": "Gestion des films"
+        },
+        {
+            "name": "Ratings",
+            "description": "Gestion des notes et avis"
+        }
+    ]
+}

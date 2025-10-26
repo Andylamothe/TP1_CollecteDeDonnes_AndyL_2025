@@ -1,0 +1,186 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TV Tracker API v1 (Deprecated)",
+        "version": "1.0.0",
+        "description": "API RESTful de base pour la gestion de médias (lecture seule - dépréciée)",
+        "contact": {
+            "name": "Andy L",
+            "email": "andy@example.com"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Serveur de développement"
+        }
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Informations sur l'API v1",
+                "description": "Retourne les informations générales sur l'API v1 (dépréciée)",
+                "tags": ["General"],
+                "responses": {
+                    "200": {
+                        "description": "Informations récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "version": { "type": "string" },
+                                        "endpoints": { "type": "object" },
+                                        "documentation": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/medias": {
+            "get": {
+                "summary": "Récupérer tous les médias",
+                "description": "Récupère la liste de tous les médias (films et séries)",
+                "tags": ["Medias"],
+                "responses": {
+                    "200": {
+                        "description": "Liste des médias récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Media" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/films": {
+            "get": {
+                "summary": "Récupérer tous les films",
+                "description": "Récupère la liste de tous les films",
+                "tags": ["Films"],
+                "responses": {
+                    "200": {
+                        "description": "Liste des films récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Film" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/series": {
+            "get": {
+                "summary": "Récupérer toutes les séries",
+                "description": "Récupère la liste de toutes les séries",
+                "tags": ["Series"],
+                "responses": {
+                    "200": {
+                        "description": "Liste des séries récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Serie" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Media": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "titre": { "type": "string" },
+                    "plateforme": { "type": "string" },
+                    "userId": { "type": "string" },
+                    "type": { "type": "string", "enum": ["film", "serie"] }
+                }
+            },
+            "Film": {
+                "allOf": [
+                    { "$ref": "#/components/schemas/Media" },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "duree": { "type": "integer" },
+                            "genre": { "type": "string" },
+                            "annee": { "type": "integer" }
+                        }
+                    }
+                ]
+            },
+            "Serie": {
+                "allOf": [
+                    { "$ref": "#/components/schemas/Media" },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "statut": { "type": "string", "enum": ["en_attente", "en_cours", "terminee"] },
+                            "saisons": {
+                                "type": "array",
+                                "items": { "$ref": "#/components/schemas/Saison" }
+                            }
+                        }
+                    }
+                ]
+            },
+            "Saison": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "numero": { "type": "integer" },
+                    "episodes": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/Episode" }
+                    }
+                }
+            },
+            "Episode": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "titre": { "type": "string" },
+                    "numero": { "type": "integer" },
+                    "duree": { "type": "integer" },
+                    "watched": { "type": "boolean" }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "General",
+            "description": "Endpoints généraux"
+        },
+        {
+            "name": "Medias",
+            "description": "Gestion des médias (lecture seule)"
+        },
+        {
+            "name": "Films",
+            "description": "Gestion des films (lecture seule)"
+        },
+        {
+            "name": "Series",
+            "description": "Gestion des séries (lecture seule)"
+        }
+    ]
+}

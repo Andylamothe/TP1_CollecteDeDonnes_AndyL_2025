@@ -1,0 +1,20 @@
+{
+    "server": {
+        "port": 8080
+    },
+    "logging": {
+        "level": "warn",
+        "file": {
+            "enabled": true,
+            "path": "/var/log/tv_tracker/app.log"
+        }
+    },
+    "swagger": {
+        "enabled": false
+    },
+    "security": {
+        "jwt": {
+            "expiresIn": "1d"
+        }
+    }
+}
