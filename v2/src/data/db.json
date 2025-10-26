@@ -1,0 +1,401 @@
+{
+  "users": [
+    {
+      "id": "admin-001",
+      "nom": "Administrateur",
+      "role": "admin"
+    },
+    {
+      "id": "user-001",
+      "nom": "Utilisateur Test",
+      "role": "user"
+    },
+    {
+      "id": "user-002",
+      "nom": "Alice Martin",
+      "role": "user"
+    }
+  ],
+  "medias": [
+    {
+      "id": "film-001",
+      "titre": "Inception - Director's Cut",
+      "plateforme": "Netflix",
+      "userId": "user-001",
+      "type": "film",
+      "duree": 158,
+      "genre": "Science Fiction",
+      "annee": 2010
+    },
+    {
+      "id": "film-003",
+      "titre": "Interstellar",
+      "plateforme": "Netflix",
+      "userId": "user-002",
+      "type": "film",
+      "duree": 169,
+      "genre": "Science Fiction",
+      "annee": 2014
+    },
+    {
+      "id": "serie-001",
+      "titre": "Breaking Bad",
+      "plateforme": "Netflix",
+      "userId": "user-002",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": [
+        {
+          "numero": 1,
+          "episodes": [
+            {
+              "id": "ep-001",
+              "titre": "Pilot",
+              "numero": 1,
+              "duree": 58,
+              "watched": true
+            },
+            {
+              "id": "ep-002",
+              "titre": "Cat's in the Bag...",
+              "numero": 2,
+              "duree": 48,
+              "watched": true
+            }
+          ]
+        },
+        {
+          "numero": 2,
+          "episodes": [
+            {
+              "id": "ep-003",
+              "titre": "Seven Thirty-Seven",
+              "numero": 1,
+              "duree": 47,
+              "watched": false
+            },
+            {
+              "id": "ep-004",
+              "titre": "Grilled",
+              "numero": 2,
+              "duree": 45,
+              "watched": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "serie-002",
+      "titre": "Stranger Things",
+      "plateforme": "Netflix",
+      "userId": "user-001",
+      "type": "serie",
+      "statut": "en_cours",
+      "saisons": [
+        {
+          "numero": 1,
+          "episodes": [
+            {
+              "id": "ep-005",
+              "titre": "Chapter One: The Vanishing of Will Byers",
+              "numero": 1,
+              "duree": 48,
+              "watched": true
+            },
+            {
+              "id": "ep-006",
+              "titre": "Chapter Two: The Weirdo on Maple Street",
+              "numero": 2,
+              "duree": 55,
+              "watched": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "48e3c05d-3a31-4ceb-86a8-bf078ddc28a5",
+      "titre": "Test Film",
+      "plateforme": "Netflix",
+      "userId": "admin-001",
+      "type": "film",
+      "duree": 120,
+      "genre": "Action",
+      "annee": 2020
+    },
+    {
+      "id": "b2bf1753-3f32-4582-8583-89c3daf67704",
+      "titre": "Game of Thrones",
+      "plateforme": "HBO",
+      "userId": "admin-001",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": []
+    },
+    {
+      "id": "db0dd0c0-1409-435f-a1be-c05978930075",
+      "titre": "Game of Thrones",
+      "plateforme": "HBO",
+      "userId": "admin-001",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": []
+    },
+    {
+      "id": "595bf6d4-2989-4295-b959-515eda924449",
+      "titre": "Game of Thrones",
+      "plateforme": "HBO",
+      "userId": "admin-001",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": []
+    },
+    {
+      "id": "28272916-224f-479c-8d47-03900fafb255",
+      "titre": "Interstellar",
+      "plateforme": "Netflix",
+      "userId": "admin-001",
+      "type": "film",
+      "duree": 169,
+      "genre": "Science Fiction",
+      "annee": 2014
+    }
+  ],
+  "films": [
+    {
+      "id": "film-001",
+      "titre": "Inception - Director's Cut",
+      "plateforme": "Netflix",
+      "userId": "user-001",
+      "type": "film",
+      "duree": 158,
+      "genre": "Science Fiction",
+      "annee": 2010
+    },
+    {
+      "id": "film-003",
+      "titre": "Interstellar",
+      "plateforme": "Netflix",
+      "userId": "user-002",
+      "type": "film",
+      "duree": 169,
+      "genre": "Science Fiction",
+      "annee": 2014
+    },
+    {
+      "id": "48e3c05d-3a31-4ceb-86a8-bf078ddc28a5",
+      "titre": "Test Film",
+      "plateforme": "Netflix",
+      "userId": "admin-001",
+      "type": "film",
+      "duree": 120,
+      "genre": "Action",
+      "annee": 2020
+    },
+    {
+      "id": "28272916-224f-479c-8d47-03900fafb255",
+      "titre": "Interstellar",
+      "plateforme": "Netflix",
+      "userId": "admin-001",
+      "type": "film",
+      "duree": 169,
+      "genre": "Science Fiction",
+      "annee": 2014
+    }
+  ],
+  "series": [
+    {
+      "id": "serie-001",
+      "titre": "Breaking Bad",
+      "plateforme": "Netflix",
+      "userId": "user-002",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": [
+        {
+          "numero": 1,
+          "episodes": [
+            {
+              "id": "ep-001",
+              "titre": "Pilot",
+              "numero": 1,
+              "duree": 58,
+              "watched": true
+            },
+            {
+              "id": "ep-002",
+              "titre": "Cat's in the Bag...",
+              "numero": 2,
+              "duree": 48,
+              "watched": true
+            }
+          ]
+        },
+        {
+          "numero": 2,
+          "episodes": [
+            {
+              "id": "ep-003",
+              "titre": "Seven Thirty-Seven",
+              "numero": 1,
+              "duree": 47,
+              "watched": false
+            },
+            {
+              "id": "ep-004",
+              "titre": "Grilled",
+              "numero": 2,
+              "duree": 45,
+              "watched": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "serie-002",
+      "titre": "Stranger Things",
+      "plateforme": "Netflix",
+      "userId": "user-001",
+      "type": "serie",
+      "statut": "en_cours",
+      "saisons": [
+        {
+          "numero": 1,
+          "episodes": [
+            {
+              "id": "ep-005",
+              "titre": "Chapter One: The Vanishing of Will Byers",
+              "numero": 1,
+              "duree": 48,
+              "watched": true
+            },
+            {
+              "id": "ep-006",
+              "titre": "Chapter Two: The Weirdo on Maple Street",
+              "numero": 2,
+              "duree": 55,
+              "watched": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b2bf1753-3f32-4582-8583-89c3daf67704",
+      "titre": "Game of Thrones",
+      "plateforme": "HBO",
+      "userId": "admin-001",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": []
+    },
+    {
+      "id": "db0dd0c0-1409-435f-a1be-c05978930075",
+      "titre": "Game of Thrones",
+      "plateforme": "HBO",
+      "userId": "admin-001",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": []
+    },
+    {
+      "id": "595bf6d4-2989-4295-b959-515eda924449",
+      "titre": "Game of Thrones",
+      "plateforme": "HBO",
+      "userId": "admin-001",
+      "type": "serie",
+      "statut": "terminee",
+      "saisons": []
+    }
+  ],
+  "saisons": [
+    {
+      "numero": 1,
+      "episodes": [
+        {
+          "id": "ep-001",
+          "titre": "Pilot",
+          "numero": 1,
+          "duree": 58,
+          "watched": true
+        },
+        {
+          "id": "ep-002",
+          "titre": "Cat's in the Bag...",
+          "numero": 2,
+          "duree": 48,
+          "watched": true
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "episodes": [
+        {
+          "id": "ep-003",
+          "titre": "Seven Thirty-Seven",
+          "numero": 1,
+          "duree": 47,
+          "watched": false
+        },
+        {
+          "id": "ep-004",
+          "titre": "Grilled",
+          "numero": 2,
+          "duree": 45,
+          "watched": false
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "episodes": []
+    }
+  ],
+  "episodes": [
+    {
+      "id": "ep-001",
+      "titre": "Pilot",
+      "numero": 1,
+      "duree": 58,
+      "watched": true
+    },
+    {
+      "id": "ep-002",
+      "titre": "Cat's in the Bag...",
+      "numero": 2,
+      "duree": 48,
+      "watched": true
+    },
+    {
+      "id": "ep-003",
+      "titre": "Seven Thirty-Seven",
+      "numero": 1,
+      "duree": 47,
+      "watched": false
+    },
+    {
+      "id": "ep-004",
+      "titre": "Grilled",
+      "numero": 2,
+      "duree": 45,
+      "watched": false
+    },
+    {
+      "id": "ep-005",
+      "titre": "Chapter One: The Vanishing of Will Byers",
+      "numero": 1,
+      "duree": 48,
+      "watched": true
+    },
+    {
+      "id": "ep-006",
+      "titre": "Chapter Two: The Weirdo on Maple Street",
+      "numero": 2,
+      "duree": 55,
+      "watched": true
+    }
+  ]
+}

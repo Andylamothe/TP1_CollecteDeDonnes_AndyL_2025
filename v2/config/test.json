@@ -1,0 +1,17 @@
+{
+    "server": {
+        "port": 3001
+    },
+    "db": {
+        "uri": "mongodb://localhost:27017/tv_tracker_v2_test"
+    },
+    "logging": {
+        "level": "error",
+        "file": {
+            "enabled": false
+        }
+    },
+    "swagger": {
+        "enabled": false
+    }
+}

@@ -1,0 +1,983 @@
+{
+	"info": {
+		"_postman_id": "tv-tracker-api-collection",
+		"name": "TV Tracker API - TP1",
+		"description": "Collection Postman pour tester l'API RESTful TV Tracker du TP1 avec filtres par type",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Base",
+			"item": [
+				{
+					"name": "GET / - Informations API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Médias",
+			"item": [
+				{
+					"name": "GET /api/medias - Liste tous les médias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias - Filtre par type (film)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?type=film",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "film"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias - Filtre par type (serie)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?type=serie",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "serie"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias - Filtre par genre (Action)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?genre=Action",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "genre",
+									"value": "Action"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias - Filtre par genre (Science Fiction)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?genre=Science Fiction",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "genre",
+									"value": "Science Fiction"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias - Filtre par année (2020)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?year=2020",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2020"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias - Filtres combinés (films d'action de 2020)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias?type=film&genre=Action&year=2020",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "film"
+								},
+								{
+									"key": "genre",
+									"value": "Action"
+								},
+								{
+									"key": "year",
+									"value": "2020"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/medias/:id - Récupère un média par ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/medias/film-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias",
+								"film-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/medias - Créer un film (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"film\",\n  \"titre\": \"Interstellar\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 169,\n  \"genre\": \"Science Fiction\",\n  \"annee\": 2014,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/medias - Créer une série (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"serie\",\n  \"titre\": \"Game of Thrones\",\n  \"plateforme\": \"HBO\",\n  \"statut\": \"terminee\",\n  \"userId\": \"user-002\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/medias - Créer un média (non-admin) - 403",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "user-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"film\",\n  \"titre\": \"Interstellar\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 169,\n  \"genre\": \"Science Fiction\",\n  \"annee\": 2014,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /api/medias/:id - Mettre à jour un média (admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Inception - Director's Cut\",\n  \"duree\": 158\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/medias/film-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias",
+								"film-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /api/medias/:id - Supprimer un média (admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/medias/film-002",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"medias",
+								"film-002"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Films",
+			"item": [
+				{
+					"name": "GET /api/films - Liste tous les films",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/films/:id - Récupère un film par ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/films/film-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films",
+								"film-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/films - Créer un film (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"The Matrix\",\n  \"plateforme\": \"HBO\",\n  \"duree\": 136,\n  \"genre\": \"Science Fiction\",\n  \"annee\": 1999,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/films - Validation échouée (titre invalide)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Film@Avec#Caractères!Spéciaux\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Séries",
+			"item": [
+				{
+					"name": "GET /api/series - Liste toutes les séries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/series",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/series/:id - Récupère une série par ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/series/serie-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series",
+								"serie-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/series - Créer une série (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Game of Thrones\",\n  \"plateforme\": \"HBO\",\n  \"statut\": \"terminee\",\n  \"userId\": \"user-002\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/series",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/series/:id/episodes - Épisodes d'une série",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/series/serie-001/episodes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series",
+								"serie-001",
+								"episodes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Saisons",
+			"item": [
+				{
+					"name": "GET /api/seasons - Liste toutes les saisons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/seasons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seasons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/seasons - Créer une saison (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/seasons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"seasons"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Épisodes",
+			"item": [
+				{
+					"name": "GET /api/episodes - Liste tous les épisodes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/episodes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"episodes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/episodes/:id - Récupère un épisode par ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/episodes/ep-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"episodes",
+								"ep-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/episodes - Créer un épisode (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Nouvel Épisode\",\n  \"numero\": 1,\n  \"duree\": 45,\n  \"watched\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/episodes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"episodes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /api/episodes/:id - Mettre à jour un épisode (admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"watched\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/episodes/ep-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"episodes",
+								"ep-001"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Utilisateurs",
+			"item": [
+				{
+					"name": "GET /api/users - Liste tous les utilisateurs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/users/:id - Récupère un utilisateur par ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/user-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"user-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/users/:id/medias - Médias d'un utilisateur",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/user-001/medias",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"user-001",
+								"medias"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Logs",
+			"item": [
+				{
+					"name": "GET /api/logs - Dernière opération",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/logs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"logs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tests de Validation",
+			"item": [
+				{
+					"name": "POST /api/films - Année future (validation échouée)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Film Futur\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Science Fiction\",\n  \"annee\": 2030,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/series - Statut invalide (validation échouée)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "admin-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Série Test\",\n  \"plateforme\": \"Netflix\",\n  \"statut\": \"statut_invalide\",\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/series",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"series"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tests d'Authentification",
+			"item": [
+				{
+					"name": "POST /api/films - Sans header x-user-id (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Film Test\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/films - Utilisateur inexistant (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "user-inexistant"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Film Test\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/films - Utilisateur non-admin (403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-user-id",
+								"value": "user-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Film Test\",\n  \"plateforme\": \"Netflix\",\n  \"duree\": 120,\n  \"genre\": \"Action\",\n  \"annee\": 2020,\n  \"userId\": \"user-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/films",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"films"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000"
+		}
+	]
+}

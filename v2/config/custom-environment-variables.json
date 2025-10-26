@@ -1,0 +1,27 @@
+{
+    "server": {
+        "port": "PORT"
+    },
+    "db": {
+        "uri": "MONGO_URI"
+    },
+    "security": {
+        "jwt": {
+            "secret": "JWT_SECRET",
+            "expiresIn": "JWT_EXPIRES_IN"
+        }
+    },
+    "cors": {
+        "origin": "CORS_ORIGIN"
+    },
+    "rateLimit": {
+        "windowMs": "RATE_LIMIT_WINDOW_MS",
+        "max": "RATE_LIMIT_MAX_REQUESTS"
+    },
+    "logging": {
+        "level": "LOG_LEVEL",
+        "file": {
+            "path": "LOG_FILE_PATH"
+        }
+    }
+}
