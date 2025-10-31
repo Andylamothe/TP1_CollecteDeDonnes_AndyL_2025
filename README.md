@@ -1,8 +1,8 @@
-# 🎉 TV Tracker API v2 - Projet Final
+#  TV Tracker API v2 - Projet Final
 
 API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT, Swagger et configuration multi-environnement.
 
-## 🚀 Démarrage Rapide
+##  Démarrage Rapide
 
 
 # 1. Installation des dépendances
@@ -34,9 +34,9 @@ npm run seed
 # Santé: http://localhost:3000/health
 
 
-## 📊 Vérification des Livrables
+##  Vérification des Livrables
 
-### ✅ **1. Code Complet (Repository)**
+###  **1. Code Complet (Repository)**
 - **Structure** : `v1/` (dépréciée) + `v2/` (active) en TypeScript
 - **Configuration** : Multi-environnement dans `v2/config/`
 - **Scripts** : `package.json` avec scripts npm complets
@@ -50,7 +50,7 @@ ls -la v1/ v2/
 npm run --silent
 ```
 
-### ✅ **2. OpenAPI Documentation (Swagger)**
+###  **2. OpenAPI Documentation (Swagger)**
 - **Fichiers** : `v2/docs/swagger-v1.json` (deprecated) + `v2/docs/swagger-v2.json` (active)
 - **Interface** : http://localhost:3000/docs
 - **Authentification** : JWT Bearer token intégré
@@ -74,7 +74,7 @@ curl http://localhost:3000/health
 # Doit retourner {"status":"ok","database":"connected"}
 
 
-### ✅ **3. MongoDB - Schémas et Connexion**
+###  **3. MongoDB - Schémas et Connexion**
 - **Modèles** : `v2/src/models/` (User, Movie, Series, Season, Episode, Rating)
 - **Index** : Optimisés pour la recherche (title, genres, relations)
 - **Seed** : `npm run seed` pour peupler la base
@@ -85,14 +85,14 @@ curl http://localhost:3000/health
 # Exécuter le seed
 npm run seed
 
-# Doit afficher "✅ Base de données peuplée avec succès"
+# Doit afficher " Base de données peuplée avec succès"
 
 # Vérifier la connexion
 curl http://localhost:3000/health
 # database: "connected"
 ```
 
-### ✅ **4. Sécurité Opérationnelle**
+###  **4. Sécurité Opérationnelle**
 - **JWT** : Authentification avec tokens (7 jours)
 - **Rôles** : Admin (CRUD) / User (lecture + notes)
 - **CORS** : Configuré par environnement
@@ -116,7 +116,7 @@ curl -X POST http://localhost:3000/api/v2/auth/login \
 curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/v2/auth/me
 ```
 
-### ✅ **5. Collection Postman**
+###  **5. Collection Postman**
 - **Fichier** : `v2/TV_Tracker_API_v2_Collection.postman_collection.json`
 - **Tests** : Cas de succès/erreur/rôles/pagination/filtres
 - **Variables** : `{{baseUrl}}` et `{{jwt_token}}` automatiques
@@ -126,7 +126,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/v2/auth/me
 2. **Configurer** : Variables `baseUrl` = `http://localhost:3000`
 3. **Exécuter** : Collection complète avec tests automatiques
 
-## 📚 Documentation Swagger Interactive
+##  Documentation Swagger Interactive
 
 ### Accès à la Documentation
 1. **Démarrez le serveur** : `npm run dev`
@@ -140,7 +140,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/v2/auth/me
 4. **Dans Swagger** : Cliquez sur "Authorize" → "Bearer" → Collez le token
 5. **Testez les endpoints protégés**
 
-## 🗄️ Schémas MongoDB (Mongoose)
+##  Schémas MongoDB (Mongoose)
 
 ### Modèles Disponibles
 
@@ -227,7 +227,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/api/v2/auth/me
 { userId: 1, targetId: 1 }
 ```
 
-## 🌱 Scripts de Seed
+##  Scripts de Seed
 
 ### Script TypeScript Principal
 ```bash
@@ -269,7 +269,7 @@ CORS_ORIGIN=http://localhost:3000
 - **Production** : `v2/config/production.json`
 - **Variables d'environnement** : `v2/config/custom-environment-variables.json`
 
-## 🎯 Endpoints API
+##  Endpoints API
 
 ### Authentification
 - `POST /api/v2/auth/register` - Inscription
@@ -289,7 +289,7 @@ CORS_ORIGIN=http://localhost:3000
 - `GET /api/v2/ratings/avg/movie/:movieId` - Moyenne des notes d'un film
 - `GET /api/v2/ratings/avg/series/:seriesId` - Moyenne des notes d'une série
 
-## 🛡️ Sécurité
+##  Sécurité
 
 - **JWT** : Authentification avec tokens (7 jours)
 - **Rôles** : Admin (CRUD complet) / User (lecture + notes)
@@ -298,7 +298,7 @@ CORS_ORIGIN=http://localhost:3000
 - **Helmet** : Headers de sécurité
 - **Validation** : Validation des données d'entrée
 
-## 📁 Structure du Projet
+##  Structure du Projet
 
 ```
 ├── v1/                          # Version 1 (dépréciée)
@@ -321,7 +321,7 @@ CORS_ORIGIN=http://localhost:3000
 └── README.md                  # Ce fichier
 ```
 
-## 🧪 Tests
+##  Tests
 
 ### Test de l'API
 ```bash
@@ -337,7 +337,7 @@ curl http://localhost:3000/
 2. **Variables** : Configurer `{{baseUrl}}` et `{{jwt_token}}`
 3. **Tests** : Exécuter la collection complète
 
-## 🚀 Commandes Utiles
+##  Commandes Utiles
 
 ```bash
 # Développement (TypeScript avec rechargement)
