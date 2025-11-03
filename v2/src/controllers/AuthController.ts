@@ -28,7 +28,7 @@ export class AuthController {
                 throw ErrorMiddleware.validationError('Le nom d\'utilisateur doit contenir entre 3 et 30 caractères');
             }
 
-            const result = await this.authService.register(email, username, password);
+            const result = await AuthController.authService.register(email, username, password);
 
             res.status(201).json({
                 message: 'Utilisateur créé avec succès',
@@ -60,7 +60,7 @@ export class AuthController {
                 throw ErrorMiddleware.validationError('Format d\'email invalide');
             }
 
-            const result = await this.authService.login(email, password);
+            const result = await AuthController.authService.login(email, password);
 
             res.json({
                 message: 'Connexion réussie',
@@ -81,7 +81,7 @@ export class AuthController {
 
     public static async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user = await this.authService.getUserById(req.user!.userId);
+            const user = await AuthController.authService.getUserById(req.user!.userId);
             
             if (!user) {
                 throw ErrorMiddleware.notFoundError('Utilisateur non trouvé');
@@ -110,7 +110,7 @@ export class AuthController {
             const { username, email } = req.body;
             const userId = req.user!.userId;
 
-            const user = await this.authService.getUserById(userId);
+            const user = await AuthController.authService.getUserById(userId);
             if (!user) {
                 throw ErrorMiddleware.notFoundError('Utilisateur non trouvé');
             }

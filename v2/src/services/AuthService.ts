@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import config from 'config';
 import { User, IUser } from '../models/User';
 import { LoggerService } from './LoggerService';
@@ -101,15 +101,19 @@ export class AuthService {
     }
 
     public generateToken(payload: AuthPayload): string {
-        const secret = config.get<string>('security.jwt.secret');
-        const expiresIn = config.get<string>('security.jwt.expiresIn');
-        
-        return jwt.sign(payload, secret, { expiresIn });
+        const secret = config.get<string>('security.jwt.secret') as Secret;
+        const rawExpiresIn = config.get<string>('security.jwt.expiresIn');
+        const options: SignOptions = {};
+        if (rawExpiresIn) {
+            // Cast explicite pour correspondre au type attendu par jsonwebtoken
+            (options as any).expiresIn = rawExpiresIn;
+        }
+        return jwt.sign(payload, secret, options);
     }
 
     public verifyToken(token: string): AuthPayload {
         try {
-            const secret = config.get<string>('security.jwt.secret');
+            const secret = config.get<string>('security.jwt.secret') as Secret;
             return jwt.verify(token, secret) as AuthPayload;
         } catch (error) {
             throw new Error('Token invalide ou expiré');

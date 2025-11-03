@@ -15,7 +15,9 @@ import { Rating } from '../src/models/Rating';
  * Mais comme on est dans le dossier v2, on doit mettre le chemin du fichier .env.local dans le fichier .env.
  * Donc on doit mettre le chemin du fichier .env.local dans le fichier .env.
  */
-dotenv.config({ path: '../../../env.local' });
+// Charger les variables d'environnement du fichier env.local à la racine du projet
+// Lors de l'exécution depuis le dossier v2, le fichier est une fois au-dessus
+dotenv.config({ path: '../env.local' });
 
 // Données de test
 const sampleUsers = [
@@ -122,8 +124,13 @@ async function seedDatabase(): Promise<void> {
         ]);
         console.log('✅ Base de données nettoyée');
 
-        // Créer les utilisateurs
-        const users = await User.insertMany(sampleUsers);
+        // Créer les utilisateurs en utilisant save() pour déclencher le hash du mot de passe (pre('save'))
+        const users: any[] = [];
+        for (const userData of sampleUsers) {
+            const user = new User(userData);
+            await user.save();
+            users.push(user);
+        }
         console.log(`✅ ${users.length} utilisateurs créés`);
 
         // Créer les films

@@ -28,8 +28,9 @@ export class RatingController {
             }
 
             // Vérifier que la cible existe
-            const targetModel = target === 'movie' ? Movie : Series;
-            const targetExists = await targetModel.findById(targetId);
+            const targetExists = target === 'movie'
+                ? await Movie.findById(targetId).exec()
+                : await Series.findById(targetId).exec();
             if (!targetExists) {
                 throw ErrorMiddleware.notFoundError(`${target === 'movie' ? 'Film' : 'Série'} non trouvé`);
             }
@@ -75,15 +76,16 @@ export class RatingController {
 
     public static async getAverageRating(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { target, targetId } = req.params;
+            const { target, targetId } = req.params as { target: 'movie' | 'series'; targetId: string };
 
             if (!['movie', 'series'].includes(target)) {
                 throw ErrorMiddleware.validationError('Le type de cible doit être "movie" ou "series"');
             }
 
             // Vérifier que la cible existe
-            const targetModel = target === 'movie' ? Movie : Series;
-            const targetExists = await targetModel.findById(targetId);
+            const targetExists = target === 'movie'
+                ? await Movie.findById(targetId).exec()
+                : await Series.findById(targetId).exec();
             if (!targetExists) {
                 throw ErrorMiddleware.notFoundError(`${target === 'movie' ? 'Film' : 'Série'} non trouvé`);
             }

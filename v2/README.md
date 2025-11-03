@@ -315,7 +315,7 @@ Ce projet est sous licence ISC.
 
 ## 👥 Auteur
 
-**Andy L** - TP2 Collecte et Interprétation des Données
+**Andy Lamothe** - TP2 Collecte et Interprétation des Données
 
 ## 🔗 Liens utiles
 

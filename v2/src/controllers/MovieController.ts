@@ -58,7 +58,7 @@ export class MovieController {
                 Movie.countDocuments(filter)
             ]);
 
-            this.logger.logOperation('GET_MOVIES', {
+            MovieController.logger.logOperation('GET_MOVIES', {
                 filter,
                 page: Number(page),
                 limit: Number(limit),
@@ -92,7 +92,7 @@ export class MovieController {
                 throw ErrorMiddleware.notFoundError('Film non trouvé');
             }
 
-            this.logger.logOperation('GET_MOVIE', {
+            MovieController.logger.logOperation('GET_MOVIE', {
                 movieId: id,
                 userId: req.user?.userId
             });
@@ -134,7 +134,7 @@ export class MovieController {
 
             await movie.save();
 
-            this.logger.logOperation('CREATE_MOVIE', {
+            MovieController.logger.logOperation('CREATE_MOVIE', {
                 movieId: movie._id,
                 title,
                 userId: req.user?.userId
@@ -172,7 +172,7 @@ export class MovieController {
             Object.assign(movie, updateData);
             await movie.save();
 
-            this.logger.logOperation('UPDATE_MOVIE', {
+            MovieController.logger.logOperation('UPDATE_MOVIE', {
                 movieId: id,
                 updateData,
                 userId: req.user?.userId
@@ -197,7 +197,7 @@ export class MovieController {
                 throw ErrorMiddleware.notFoundError('Film non trouvé');
             }
 
-            this.logger.logOperation('DELETE_MOVIE', {
+            MovieController.logger.logOperation('DELETE_MOVIE', {
                 movieId: id,
                 title: movie.title,
                 userId: req.user?.userId
