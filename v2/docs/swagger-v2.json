@@ -5,7 +5,7 @@
         "version": "2.0.0",
         "description": "API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT et Swagger",
         "contact": {
-            "name": "Andy L",
+            "name": "Andy Lamothe",
             "email": "andy@example.com"
         }
     },

@@ -1,6 +1,8 @@
 import express from 'express';
 import config from 'config';
 import dotenv from 'dotenv';
+
+
 import { DatabaseService } from './src/services/DatabaseService';
 import { LoggerService } from './src/services/LoggerService';
 import { SecurityMiddleware } from './src/middlewares/security.middleware';
@@ -102,15 +104,15 @@ async function startServer(): Promise<void> {
                 environment: process.env.NODE_ENV || 'development'
             });
             
-            console.log(`🚀 Serveur v2 démarré sur ${HOST}:${PORT}`);
-            console.log(`📖 API disponible sur http://${HOST}:${PORT}`);
-            console.log(`🔧 Environnement: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`📊 Base de données: ${config.get<string>('db.uri')}`);
+            console.log(` Serveur v2 démarré sur ${HOST}:${PORT}`);
+            console.log(` API disponible sur http://${HOST}:${PORT}`);
+            console.log(` Environnement: ${process.env.NODE_ENV || 'development'}`);
+            console.log(` Base de données: ${config.get<string>('db.uri')}`);
         });
 
     } catch (error) {
         logger.logError('SERVER_START_ERROR', error);
-        console.error('❌ Erreur lors du démarrage du serveur:', error);
+        console.error(' Erreur lors du démarrage du serveur:', error);
         process.exit(1);
     }
 }
@@ -140,9 +142,10 @@ process.on('uncaughtException', (error) => {
     process.exit(1);
 });
 
+
 // Démarrer le serveur
 startServer().catch(error => {
     logger.logError('SERVER_STARTUP_ERROR', error);
-    console.error('❌ Erreur critique lors du démarrage:', error);
+    console.error(' Erreur critique lors du démarrage:', error);
     process.exit(1);
 });

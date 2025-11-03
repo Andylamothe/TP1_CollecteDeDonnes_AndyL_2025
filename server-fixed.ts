@@ -1,5 +1,5 @@
 import express from 'express';
-import * as mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import * as bcrypt from 'bcryptjs';
@@ -28,9 +28,14 @@ const swaggerOptions = {
         },
         servers: [
             {
+                url: 'https://localhost:3001',
+                description: 'Serveur de prod'
+            },
+            {
                 url: 'http://localhost:3000',
                 description: 'Serveur de développement'
             }
+
         ],
         components: {
             securitySchemes: {
@@ -42,7 +47,8 @@ const swaggerOptions = {
             }
         }
     },
-    apis: ['./server-fixed.ts']
+    // glob qui fonctionne en dev (ts) et après compilation (dist/*.js)
+    apis: ['./**/*.ts', './dist/**/*.js']
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -98,7 +104,13 @@ const authenticateToken = (req: any, res: any, next: any): void => {
         return;
     }
 
-    jwt.verify(token, process.env.JWT_SECRET!, (err: any, user: any) => {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        res.status(500).json({ message: 'JWT_SECRET non configuré' });
+        return;
+    }
+
+    jwt.verify(token, secret, (err: any, user: any) => {
         if (err) {
             res.status(403).json({ message: 'Token invalide' });
             return;
@@ -125,10 +137,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
+    // Protection contre mongoose.connection undefined
+    let dbStatus = 'unknown';
+    try {
+        const readyState = mongoose && (mongoose as any).connection ? (mongoose as any).connection.readyState : undefined;
+        if (readyState === 1) dbStatus = 'connected';
+        else if (readyState === 2) dbStatus = 'connecting';
+        else if (typeof readyState === 'number') dbStatus = 'disconnected';
+        else dbStatus = 'unknown';
+    } catch (e) {
+        dbStatus = 'unknown';
+    }
+
     res.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        database: dbStatus,
         environment: process.env.NODE_ENV || 'development'
     });
 });
@@ -347,6 +371,15 @@ async function connectToMongoDB() {
         process.exit(1);
     }
 }
+
+// Global error handler pour attraper erreurs non gérées dans les routes
+app.use((err: any, req: any, res: any, next: any) => {
+    console.error('Unhandled error:', err && err.stack ? err.stack : err);
+    res.status(err?.status || 500).json({
+        message: 'Erreur interne du serveur',
+        error: process.env.NODE_ENV === 'development' ? err?.message || err : undefined
+    });
+});
 
 // Démarrage du serveur
 const PORT = process.env.PORT || 3000;
