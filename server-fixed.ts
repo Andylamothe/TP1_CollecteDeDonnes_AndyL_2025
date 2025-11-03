@@ -7,6 +7,8 @@ import * as jwt from 'jsonwebtoken';
 import swaggerJsdoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import * as dotenv from 'dotenv';
+import swagerSpec from './v2/docs/swagger-v1.json'
+import swagerSpec2 from './v2/docs/swagger-v2.json'
 
 // Charger les variables d'environnement
 dotenv.config({ path: './env.local' });
@@ -17,46 +19,18 @@ app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
-// Configuration Swagger
-const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'TV Tracker API v2',
-            version: '2.0.0',
-            description: 'API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT et Swagger'
-        },
-        servers: [
-            {
-                url: 'https://localhost:3001',
-                description: 'Serveur de prod'
-            },
-            {
-                url: 'http://localhost:3000',
-                description: 'Serveur de développement'
-            }
 
-        ],
-        components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
-                }
-            }
-        }
-    },
-    // glob qui fonctionne en dev (ts) et après compilation (dist/*.js)
-    apis: ['./**/*.ts', './dist/**/*.js']
-};
-
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
+const swaggerSpecv2 = swagerSpec2;
+const swaggerSpecv1 = swagerSpec;
 // Routes Swagger
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+app.use('/docs/v2', swaggerUi.serveFiles(swaggerSpecv2), swaggerUi.setup(swaggerSpecv2, {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'TV Tracker API v2 - Documentation'
+}));
+
+app.use('/docs/v1', swaggerUi.serveFiles(swaggerSpecv1), swaggerUi.setup(swaggerSpecv1, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'TV Tracker API v1 - Documentation'
 }));
 
 // Modèles Mongoose
@@ -291,11 +265,11 @@ app.get('/api/v2/movies/:id', async (req, res) => {
     }
 });
 
-app.post('/api/v2/movies', authenticateToken, async (req: any, res) => {
+// POST movie — ajouté return pour satisfaire TS et cohérence
+app.post('/api/v2/movies', authenticateToken, async (req: any, res: any): Promise<any> => {
     try {
         if (req.user.role !== 'admin') {
-            res.status(403).json({ message: 'Permissions insuffisantes' });
-            return;
+            return res.status(403).json({ message: 'Permissions insuffisantes' });
         }
 
         const { title, genres, synopsis, releaseDate, durationMin } = req.body;
@@ -309,17 +283,64 @@ app.post('/api/v2/movies', authenticateToken, async (req: any, res) => {
 
         await movie.save();
 
-        res.status(201).json({
+        return res.status(201).json({
             message: 'Film créé avec succès',
             data: movie
         });
     } catch (error: any) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
+    }
+});
+
+// --- PATCH & DELETE endpoints pour movies ---
+app.patch('/api/v2/movies/:id', authenticateToken, async (req: any, res: any): Promise<any> => {
+    try {
+        // seulement admin peut modifier un film
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Permissions insuffisantes' });
+        }
+
+        const updates = req.body;
+        // runValidators pour que les validations mongoose s'appliquent aux champs mis à jour
+        const movie = await Movie.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+
+        if (!movie) {
+            return res.status(404).json({ message: 'Film non trouvé' });
+        }
+
+        return res.json({ message: 'Film mis à jour avec succès', data: movie });
+    } catch (error: any) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'ID invalide' });
+        }
+        return res.status(400).json({ message: error.message });
+    }
+});
+
+app.delete('/api/v2/movies/:id', authenticateToken, async (req: any, res: any): Promise<any> => {
+    try {
+        // seulement admin peut supprimer un film
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Permissions insuffisantes' });
+        }
+
+        const movie = await Movie.findByIdAndDelete(req.params.id);
+        if (!movie) {
+            return res.status(404).json({ message: 'Film non trouvé' });
+        }
+
+        return res.json({ message: 'Film supprimé avec succès', data: { id: req.params.id } });
+    } catch (error: any) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'ID invalide' });
+        }
+        return res.status(400).json({ message: error.message });
     }
 });
 
 // Routes des notes
-app.post('/api/v2/ratings', authenticateToken, async (req: any, res) => {
+// POST rating — ajouté return pour satisfaire TS et cohérence
+app.post('/api/v2/ratings', authenticateToken, async (req: any, res: any): Promise<any> => {
     try {
         const { target, targetId, score, review } = req.body;
         
@@ -333,12 +354,12 @@ app.post('/api/v2/ratings', authenticateToken, async (req: any, res) => {
 
         await rating.save();
 
-        res.status(201).json({
+        return res.status(201).json({
             message: 'Note créée avec succès',
             data: rating
         });
     } catch (error: any) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 });
 
@@ -354,20 +375,79 @@ app.get('/api/v2/ratings/my', authenticateToken, async (req: any, res) => {
     }
 });
 
+// --- PATCH & DELETE endpoints pour ratings ---
+// PATCH: l'auteur de la note ou admin peut modifier
+app.patch('/api/v2/ratings/:id', authenticateToken, async (req: any, res: any): Promise<any> => {
+    try {
+        const rating = await Rating.findById(req.params.id);
+        if (!rating) {
+            return res.status(404).json({ message: 'Note non trouvée' });
+        }
+
+        const userIdStr = req.user.userId ? String(req.user.userId) : null;
+        const ratingOwnerId = rating.userId ? String(rating.userId) : null;
+
+        if (req.user.role !== 'admin' && userIdStr !== ratingOwnerId) {
+            return res.status(403).json({ message: 'Permissions insuffisantes pour modifier cette note' });
+        }
+
+        const updates = req.body;
+        // On autorise uniquement certains champs à être mis à jour (sécurité)
+        const allowed = ['score', 'review'];
+        const filtered: any = {};
+        for (const key of allowed) {
+            if (updates[key] !== undefined) filtered[key] = updates[key];
+        }
+
+        const updatedRating = await Rating.findByIdAndUpdate(req.params.id, filtered, { new: true, runValidators: true });
+        return res.json({ message: 'Note mise à jour avec succès', data: updatedRating });
+    } catch (error: any) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'ID invalide' });
+        }
+        return res.status(400).json({ message: error.message });
+    }
+});
+
+// DELETE: l'auteur de la note ou admin peut supprimer
+app.delete('/api/v2/ratings/:id', authenticateToken, async (req: any, res: any): Promise<any> => {
+    try {
+        const rating = await Rating.findById(req.params.id);
+        if (!rating) {
+            return res.status(404).json({ message: 'Note non trouvée' });
+        }
+
+        const userIdStr = req.user.userId ? String(req.user.userId) : null;
+        const ratingOwnerId = rating.userId ? String(rating.userId) : null;
+
+        if (req.user.role !== 'admin' && userIdStr !== ratingOwnerId) {
+            return res.status(403).json({ message: 'Permissions insuffisantes pour supprimer cette note' });
+        }
+
+        await Rating.findByIdAndDelete(req.params.id);
+        return res.json({ message: 'Note supprimée avec succès', data: { id: req.params.id } });
+    } catch (error: any) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'ID invalide' });
+        }
+        return res.status(400).json({ message: error.message });
+    }
+});
+
 // Fonction de connexion à MongoDB
 async function connectToMongoDB() {
     try {
-        console.log('🔄 Connexion à MongoDB Atlas...');
+        console.log(' Connexion à MongoDB Atlas...');
         await mongoose.connect(process.env.MONGO_URI!, {
             maxPoolSize: 10,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
         });
-        console.log('✅ Connexion à MongoDB Atlas réussie !');
+        console.log(' Connexion à MongoDB Atlas réussie !');
         const dbName = mongoose.connection?.db?.databaseName || '(inconnue)';
-        console.log('📊 Base de données:', dbName);
+        console.log(' Base de données:', dbName);
     } catch (error: any) {
-        console.error('❌ Erreur de connexion MongoDB:', error.message);
+        console.error(' Erreur de connexion MongoDB:', error.message);
         process.exit(1);
     }
 }
@@ -400,11 +480,15 @@ async function startServer() {
             console.log(`   GET  /api/v2/movies         - Liste des films`);
             console.log(`   GET  /api/v2/movies/:id     - Film par ID`);
             console.log(`   POST /api/v2/movies         - Créer un film (Admin, JWT requis)`);
+            console.log(`   PATCH /api/v2/movies/:id    - Mettre à jour un film (Admin, JWT requis)`);
+            console.log(`   DELETE /api/v2/movies/:id   - Supprimer un film (Admin, JWT requis)`);
             console.log(`   POST /api/v2/ratings        - Créer une note (JWT requis)`);
+            console.log(`   PATCH /api/v2/ratings/:id   - Mettre à jour une note (Auteur ou Admin)`);
+            console.log(`   DELETE /api/v2/ratings/:id  - Supprimer une note (Auteur ou Admin)`);
             console.log(`   GET  /api/v2/ratings/my     - Mes notes (JWT requis)`);
         });
     } catch (error: any) {
-        console.error('❌ Erreur lors du démarrage:', error);
+        console.error(' Erreur lors du démarrage:', error);
         process.exit(1);
     }
 }
