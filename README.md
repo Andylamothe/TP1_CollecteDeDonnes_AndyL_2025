@@ -11,7 +11,7 @@ npm run install:all
 ```
 # 2. Configuration de l'environnement
 ```bash
-cp v2/env.example .env
+cp env.local .env
 ```
 # Éditer .env avec vos valeurs MongoDB
 
