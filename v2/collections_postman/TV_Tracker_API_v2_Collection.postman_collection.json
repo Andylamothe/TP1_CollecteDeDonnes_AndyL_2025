@@ -24,6 +24,16 @@
             "key": "jwt_token",
             "value": "",
             "type": "string"
+        },
+        {
+            "key": "movie_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "rating_id",
+            "value": "",
+            "type": "string"
         }
     ],
     "item": [
@@ -121,6 +131,41 @@
                         "body": {
                             "mode": "raw",
                             "raw": "{\n  \"email\": \"user@tvtracker.com\",\n  \"password\": \"user123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v2/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v2", "auth", "login"]
+                        }
+                    }
+                },
+                {
+                    "name": "Login Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.collectionVariables.set('jwt_token', response.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@tvtracker.com\",\n  \"password\": \"admin123\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/v2/auth/login",
@@ -231,6 +276,21 @@
                 },
                 {
                     "name": "Create Movie (Admin)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const json = pm.response.json();",
+                                    "  const id = json.data ? json.data._id : (json._id || (json.movie && json.movie._id));",
+                                    "  if (id) pm.collectionVariables.set('movie_id', id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -290,6 +350,21 @@
             "item": [
                 {
                     "name": "Create Rating",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201 || pm.response.code === 200) {",
+                                    "  const json = pm.response.json();",
+                                    "  const id = json.data ? json.data._id : (json._id || (json.rating && json.rating._id));",
+                                    "  if (id) pm.collectionVariables.set('rating_id', id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [

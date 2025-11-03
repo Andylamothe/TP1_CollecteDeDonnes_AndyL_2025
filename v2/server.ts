@@ -69,10 +69,10 @@ app.get('/health', (req, res) => {
 });
 
 // Middleware de gestion des erreurs
-app.use(ErrorMiddleware.handleError);
+app.use(ErrorMiddleware.handleError.bind(ErrorMiddleware));
 
 // Middleware pour les routes non trouvées
-app.use(ErrorMiddleware.notFound);
+app.use(ErrorMiddleware.notFound.bind(ErrorMiddleware));
 
 // Fonction d'initialisation
 async function initializeServices(): Promise<void> {

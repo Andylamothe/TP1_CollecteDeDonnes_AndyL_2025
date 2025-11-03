@@ -34,10 +34,10 @@ export class AuthMiddleware {
             const token = authHeader.substring(7); // Enlever "Bearer "
             
             try {
-                const payload = this.authService.verifyToken(token);
+                const payload = AuthMiddleware.authService.verifyToken(token);
                 
                 // Vérifier que l'utilisateur existe toujours
-                const user = await this.authService.getUserById(payload.userId);
+                const user = await AuthMiddleware.authService.getUserById(payload.userId);
                 if (!user) {
                     res.status(401).json({
                         message: 'Utilisateur non trouvé',
@@ -50,7 +50,7 @@ export class AuthMiddleware {
                 next();
 
             } catch (error) {
-                this.logger.logError('AUTH_TOKEN_VERIFY_ERROR', error);
+                AuthMiddleware.logger.logError('AUTH_TOKEN_VERIFY_ERROR', error);
                 res.status(401).json({
                     message: 'Token invalide ou expiré',
                     code: 'INVALID_TOKEN'
@@ -59,7 +59,7 @@ export class AuthMiddleware {
             }
 
         } catch (error) {
-            this.logger.logError('AUTH_MIDDLEWARE_ERROR', error);
+            AuthMiddleware.logger.logError('AUTH_MIDDLEWARE_ERROR', error);
             res.status(500).json({
                 message: 'Erreur interne du serveur',
                 code: 'INTERNAL_SERVER_ERROR'
@@ -104,7 +104,7 @@ export class AuthMiddleware {
         const token = authHeader.substring(7);
         
         try {
-            const payload = this.authService.verifyToken(token);
+            const payload = AuthMiddleware.authService.verifyToken(token);
             req.user = payload;
         } catch (error) {
             // Ignorer l'erreur pour l'authentification optionnelle
