@@ -5,13 +5,13 @@
         "version": "1.0.0",
         "description": "API RESTful de base pour la gestion de médias (lecture seule - dépréciée)",
         "contact": {
-            "name": "Andy L",
+            "name": "Andy Lamothe",
             "email": "andy@example.com"
         }
     },
     "servers": [
         {
-            "url": "http://localhost:3000",
+            "url": "http://localhost:3001",
             "description": "Serveur de développement"
         }
     ],
@@ -20,6 +20,7 @@
             "get": {
                 "summary": "Informations sur l'API v1",
                 "description": "Retourne les informations générales sur l'API v1 (dépréciée)",
+                "deprecated" : true,
                 "tags": ["General"],
                 "responses": {
                     "200": {
@@ -44,6 +45,7 @@
         "/api/medias": {
             "get": {
                 "summary": "Récupérer tous les médias",
+                "deprecated" : true,
                 "description": "Récupère la liste de tous les médias (films et séries)",
                 "tags": ["Medias"],
                 "responses": {
@@ -64,6 +66,7 @@
         "/api/films": {
             "get": {
                 "summary": "Récupérer tous les films",
+                "deprecated" : true,
                 "description": "Récupère la liste de tous les films",
                 "tags": ["Films"],
                 "responses": {
@@ -83,6 +86,7 @@
         },
         "/api/series": {
             "get": {
+                "deprecated" : true,
                 "summary": "Récupérer toutes les séries",
                 "description": "Récupère la liste de toutes les séries",
                 "tags": ["Series"],
