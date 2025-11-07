@@ -1,8 +1,8 @@
-# 🎉 TV Tracker API v2 - Projet Final
+#  TV Tracker API v2 - Projet Final
 
 API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT, Swagger et configuration multi-environnement.
 
-## 🚀 Démarrage Rapide
+##  Démarrage Rapide
 
 ### 1. Installation des dépendances
 ```bash
@@ -33,6 +33,7 @@ CORS_ORIGIN_PROD=https://yourdomain.com  # Production: CORS restreint
 ```bash
 npm run dev
 ```
+# Doit retourner {"status":"ok","database":"connected"}
 
 **Production (Cluster MongoDB) :**
 ```bash
@@ -95,7 +96,7 @@ npm run seed:prod
 - `PATCH /api/v2/ratings/:id` - Modifier une note (Auteur ou Admin, JWT requis)
 - `DELETE /api/v2/ratings/:id` - Supprimer une note (Auteur ou Admin, JWT requis)
 
-## 📚 Documentation Swagger Interactive
+##  Documentation Swagger Interactive
 
 ### Accès à la Documentation
 1. **Démarrez le serveur** : `npm run dev` ou `npm run prod`
@@ -120,7 +121,7 @@ npm run seed:prod
 - ✅ **Pagination** : Format `{items, total, page, pages}` documenté
 - ✅ **Filtres** : Tous les filtres de recherche documentés
 
-## 🗄️ Schémas MongoDB (Mongoose)
+##  Schémas MongoDB (Mongoose)
 
 ### Modèles Disponibles
 
@@ -169,7 +170,7 @@ npm run seed:prod
 { target: 1, targetId: 1 }  // Pour les moyennes
 ```
 
-## 🌱 Scripts de Seed
+##  Scripts de Seed
 
 ### Script TypeScript Principal
 ```bash
@@ -255,7 +256,7 @@ HTTPS_ENABLED=false
 - Content Security Policy
 - Protection contre XSS, clickjacking, etc.
 
-## 📁 Structure du Projet
+##  Structure du Projet
 
 ```
 ├── server-fixed.ts          # Serveur principal (utilisé)
@@ -283,7 +284,7 @@ HTTPS_ENABLED=false
 └── README.md                # Ce fichier
 ```
 
-## 🧪 Tests
+##  Tests
 
 ### Test de l'API
 ```bash
@@ -306,7 +307,7 @@ curl "http://localhost:3000/api/v2/movies?title=Avatar&genre=Action"
 3. **Authentification** : Exécuter "Register" ou "Login" pour obtenir le token
 4. **Tests** : Exécuter la collection complète avec tests automatiques
 
-## 🚀 Commandes Utiles
+##  Commandes Utiles
 
 ```bash
 # Développement (MongoDB local)
