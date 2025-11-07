@@ -15,14 +15,12 @@
     "author": "Andy L",
     "license": "ISC",
     "scripts": {
-        "dev": "ts-node-dev --respawn server-fixed.ts",
-        "prod": "NODE_ENV=production node dist/server.js",
+        "dev": "cross-env NODE_ENV=development ts-node-dev --respawn server-fixed.ts",
+        "prod": "cross-env NODE_ENV=production ts-node-dev --respawn server-fixed.ts",
         "build": "tsc",
-        "seed": "npx ts-node seed-simple.ts",
-        "test:typescript": "ts-node test-typescript.ts",
-        "install:v1": "cd v1 && npm install",
-        "install:v2": "cd v2 && npm install",
-        "install:all": "npm run install:v1 && npm run install:v2 && npm install"
+        "seed": "cross-env NODE_ENV=development npx ts-node seed-simple.ts",
+        "seed:prod": "cross-env NODE_ENV=production npx ts-node seed-simple.ts",
+        "test:typescript": "ts-node test-typescript.ts"
     },
     "dependencies": {
         "@types/bcryptjs": "^2.4.6",
@@ -52,6 +50,7 @@
     },
     "devDependencies": {
         "@types/config": "^3.3.5",
+        "cross-env": "^7.0.3",
         "ts-node": "^10.9.2",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.5.4"

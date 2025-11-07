@@ -263,7 +263,7 @@
                                     "type": "object",
                                     "properties": {
                                         "message": { "type": "string" },
-                                        "data": {
+                                        "items": {
                                             "type": "array",
                                             "items": { "$ref": "#/components/schemas/Movie" }
                                         },
@@ -358,6 +358,586 @@
                     }
                 }
             }
+        },
+        "/api/v2/auth/me": {
+            "get": {
+                "summary": "Récupérer le profil de l'utilisateur connecté",
+                "description": "Retourne les informations du profil de l'utilisateur authentifié",
+                "tags": ["Authentication"],
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Profil récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "user": { "$ref": "#/components/schemas/User" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/movies/{id}": {
+            "get": {
+                "summary": "Récupérer un film par son ID",
+                "description": "Récupère les détails d'un film spécifique",
+                "tags": ["Movies"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID du film",
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": { "$ref": "#/components/schemas/Movie" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Mettre à jour un film",
+                "description": "Met à jour un film existant (Admin uniquement)",
+                "tags": ["Movies"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID du film",
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": { "type": "string" },
+                                    "genres": {
+                                        "type": "array",
+                                        "items": { "type": "string" }
+                                    },
+                                    "synopsis": { "type": "string" },
+                                    "releaseDate": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "durationMin": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 600
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Film mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": { "$ref": "#/components/schemas/Movie" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions insuffisantes",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer un film",
+                "description": "Supprime un film (Admin uniquement)",
+                "tags": ["Movies"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID du film",
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film supprimé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions insuffisantes",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/ratings": {
+            "post": {
+                "summary": "Créer une nouvelle note",
+                "description": "Crée une nouvelle note pour un film ou une série",
+                "tags": ["Ratings"],
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["target", "targetId", "score"],
+                                "properties": {
+                                    "target": {
+                                        "type": "string",
+                                        "enum": ["movie", "series"],
+                                        "example": "movie"
+                                    },
+                                    "targetId": {
+                                        "type": "string",
+                                        "example": "507f1f77bcf86cd799439011"
+                                    },
+                                    "score": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 10,
+                                        "description": "Note entre 1 et 10",
+                                        "example": 8
+                                    },
+                                    "review": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "Excellent film avec une histoire captivante"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Note créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": { "$ref": "#/components/schemas/Rating" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cible non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/ratings/my": {
+            "get": {
+                "summary": "Récupérer les notes de l'utilisateur connecté",
+                "description": "Récupère toutes les notes créées par l'utilisateur authentifié avec pagination",
+                "tags": ["Ratings"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de page",
+                        "schema": { "type": "integer", "default": 1 }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page",
+                        "schema": { "type": "integer", "default": 10 }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notes récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "items": {
+                                            "type": "array",
+                                            "items": { "$ref": "#/components/schemas/Rating" }
+                                        },
+                                        "pagination": { "$ref": "#/components/schemas/Pagination" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/ratings/avg/{target}/{targetId}": {
+            "get": {
+                "summary": "Récupérer la moyenne des notes",
+                "description": "Calcule et retourne la moyenne des notes pour un film ou une série",
+                "tags": ["Ratings"],
+                "parameters": [
+                    {
+                        "name": "target",
+                        "in": "path",
+                        "required": true,
+                        "description": "Type de cible (movie ou series)",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["movie", "series"]
+                        }
+                    },
+                    {
+                        "name": "targetId",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID de la cible",
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Moyenne des notes récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "target": { "type": "string" },
+                                                "targetId": { "type": "string" },
+                                                "averageScore": {
+                                                    "type": "number",
+                                                    "description": "Moyenne des notes (arrondie à 1 décimale)"
+                                                },
+                                                "totalRatings": {
+                                                    "type": "integer",
+                                                    "description": "Nombre total de notes"
+                                                },
+                                                "distribution": {
+                                                    "type": "object",
+                                                    "description": "Distribution des notes par score",
+                                                    "additionalProperties": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Type de cible invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cible non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/ratings/{id}": {
+            "patch": {
+                "summary": "Mettre à jour une note",
+                "description": "Met à jour une note existante (Auteur ou Admin uniquement)",
+                "tags": ["Ratings"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID de la note",
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "score": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 10,
+                                        "description": "Note entre 1 et 10"
+                                    },
+                                    "review": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Note mise à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": { "$ref": "#/components/schemas/Rating" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions insuffisantes",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Note non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Supprimer une note",
+                "description": "Supprime une note (Auteur ou Admin uniquement)",
+                "tags": ["Ratings"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID de la note",
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Note supprimée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string" },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions insuffisantes",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Note non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Error" }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -402,16 +982,50 @@
             },
             "Rating": {
                 "type": "object",
+                "description": "Schéma de notation pour un film ou une série",
                 "properties": {
-                    "_id": { "type": "string" },
-                    "userId": { "type": "string" },
-                    "target": { "type": "string", "enum": ["movie", "series"] },
-                    "targetId": { "type": "string" },
-                    "score": { "type": "integer", "minimum": 1, "maximum": 10 },
-                    "review": { "type": "string" },
-                    "createdAt": { "type": "string", "format": "date-time" },
-                    "updatedAt": { "type": "string", "format": "date-time" }
-                }
+                    "_id": {
+                        "type": "string",
+                        "description": "ID unique de la note"
+                    },
+                    "userId": {
+                        "type": "string",
+                        "description": "ID de l'utilisateur qui a créé la note"
+                    },
+                    "target": {
+                        "type": "string",
+                        "enum": ["movie", "series"],
+                        "description": "Type de cible notée"
+                    },
+                    "targetId": {
+                        "type": "string",
+                        "description": "ID de la cible notée (film ou série)"
+                    },
+                    "score": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10,
+                        "description": "Note attribuée (entre 1 et 10). 1 = très mauvais, 10 = excellent",
+                        "example": 8
+                    },
+                    "review": {
+                        "type": "string",
+                        "maxLength": 1000,
+                        "description": "Avis textuel optionnel (maximum 1000 caractères)",
+                        "example": "Excellent film avec une histoire captivante et des effets spéciaux impressionnants"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date de création de la note"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date de dernière modification de la note"
+                    }
+                },
+                "required": ["userId", "target", "targetId", "score"]
             },
             "Pagination": {
                 "type": "object",
