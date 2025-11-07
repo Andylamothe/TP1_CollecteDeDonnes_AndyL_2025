@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import swaggerJsdoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import * as dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import swagerSpec from './v2/docs/swagger-v1.json'
 import swagerSpec2 from './v2/docs/swagger-v2.json'
 
@@ -14,10 +15,102 @@ import swagerSpec2 from './v2/docs/swagger-v2.json'
 dotenv.config({ path: './env.local' });
 const app = express();
 
-// middlewares
-app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
-app.use(express.json());
+const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+
+// Configuration MongoDB selon l'environnement
+// Dev : MongoDB local, Prod : Cluster MongoDB
+const getMongoUri = (): string => {
+    if (isProduction) {
+        // Production : utiliser le cluster MongoDB
+        return process.env.MONGO_URI || process.env.MONGO_URI_PROD || '';
+    } else {
+        // Development : utiliser MongoDB local
+        return process.env.MONGO_URI_DEV || 'mongodb://localhost:27017/tv_tracker_v2_dev';
+    }
+};
+
+// Configuration CORS selon l'environnement
+const getCorsOrigin = (): string | string[] => {
+    if (isProduction) {
+        // Production : CORS restreint
+        return process.env.CORS_ORIGIN_PROD ? process.env.CORS_ORIGIN_PROD.split(',') : [];
+    } else {
+        // Development : CORS permissif
+        return process.env.CORS_ORIGIN || 'http://localhost:3000';
+    }
+};
+
+// Middleware HTTPS redirect pour la production
+// Seulement si HTTPS est explicitement activé et qu'on n'est pas en localhost
+if (isProduction && process.env.HTTPS_ENABLED === 'true') {
+    app.use((req, res, next) => {
+        // Ne pas rediriger si on est en localhost (développement local)
+        const host = req.header('host') || '';
+        if (host.includes('localhost') || host.includes('127.0.0.1')) {
+            return next();
+        }
+        
+        // Rediriger HTTP vers HTTPS en production réelle
+        if (req.header('x-forwarded-proto') !== 'https') {
+            res.redirect(`https://${host}${req.url}`);
+        } else {
+            next();
+        }
+    });
+}
+
+// Middlewares de sécurité
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+        },
+    },
+    crossOriginEmbedderPolicy: false
+}));
+
+app.use(cors({ 
+    origin: getCorsOrigin(), 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Rate limiting général
+const generalLimiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || (isProduction ? '50' : '100')),
+    message: {
+        message: 'Trop de requêtes, veuillez réessayer plus tard',
+        code: 'RATE_LIMIT_EXCEEDED',
+        retryAfter: Math.ceil(parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000') / 1000)
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Rate limiting pour l'authentification (plus strict)
+const authLimiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_AUTH_WINDOW_MS || '900000'), // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_AUTH_MAX || '5'),
+    message: {
+        message: 'Trop de tentatives de connexion, veuillez réessayer plus tard',
+        code: 'AUTH_RATE_LIMIT_EXCEEDED',
+        retryAfter: Math.ceil(parseInt(process.env.RATE_LIMIT_AUTH_WINDOW_MS || '900000') / 1000)
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Appliquer le rate limiting général
+app.use(generalLimiter);
 
 
 const swaggerSpecv2 = swagerSpec2;
@@ -131,8 +224,8 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Routes d'authentification
-app.post('/api/v2/auth/register', async (req, res) => {
+// Routes d'authentification avec rate limiting
+app.post('/api/v2/auth/register', authLimiter, async (req, res) => {
     try {
         const { email, username, password } = req.body;
         
@@ -172,7 +265,7 @@ app.post('/api/v2/auth/register', async (req, res) => {
     }
 });
 
-app.post('/api/v2/auth/login', async (req, res) => {
+app.post('/api/v2/auth/login', authLimiter, async (req, res) => {
     try {
         const { email, password } = req.body;
         
@@ -239,10 +332,67 @@ app.get('/api/v2/auth/me', authenticateToken, async (req: any, res) => {
 // Routes des films
 app.get('/api/v2/movies', async (req, res) => {
     try {
-        const movies = await Movie.find().limit(10);
+        const {
+            title,
+            genre,
+            minYear,
+            maxYear,
+            minDuration,
+            maxDuration,
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        // Construction du filtre
+        const filter: any = {};
+
+        if (title) {
+            filter.$or = [
+                { title: { $regex: title, $options: 'i' } },
+                { synopsis: { $regex: title, $options: 'i' } }
+            ];
+        }
+
+        if (genre) {
+            filter.genres = { $in: Array.isArray(genre) ? genre : [genre] };
+        }
+
+        if (minYear || maxYear) {
+            filter.releaseDate = {};
+            if (minYear) filter.releaseDate.$gte = new Date(`${minYear}-01-01`);
+            if (maxYear) filter.releaseDate.$lte = new Date(`${maxYear}-12-31`);
+        }
+
+        if (minDuration || maxDuration) {
+            filter.durationMin = {};
+            if (minDuration) filter.durationMin.$gte = Number(minDuration);
+            if (maxDuration) filter.durationMin.$lte = Number(maxDuration);
+        }
+
+        // Calcul de la pagination
+        const pageNum = Number(page);
+        const limitNum = Number(limit);
+        const skip = (pageNum - 1) * limitNum;
+
+        // Exécution de la requête
+        const [movies, total] = await Promise.all([
+            Movie.find(filter)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limitNum)
+                .lean(),
+            Movie.countDocuments(filter)
+        ]);
+
         res.json({
             message: 'Films récupérés avec succès',
-            data: movies
+            items: movies,
+            pagination: {
+                page: pageNum,
+                limit: limitNum,
+                total,
+                pages: Math.ceil(total / limitNum)
+            }
         });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
@@ -365,13 +515,99 @@ app.post('/api/v2/ratings', authenticateToken, async (req: any, res: any): Promi
 
 app.get('/api/v2/ratings/my', authenticateToken, async (req: any, res) => {
     try {
-        const ratings = await Rating.find({ userId: req.user.userId });
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const [ratings, total] = await Promise.all([
+            Rating.find({ userId: req.user.userId })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Rating.countDocuments({ userId: req.user.userId })
+        ]);
+
         res.json({
             message: 'Notes récupérées avec succès',
-            data: ratings
+            items: ratings,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
         });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+// Route pour obtenir la moyenne des notes d'un film ou d'une série
+app.get('/api/v2/ratings/avg/:target/:targetId', async (req: any, res: any): Promise<any> => {
+    try {
+        const { target, targetId } = req.params;
+
+        if (!['movie', 'series'].includes(target)) {
+            return res.status(400).json({ message: 'Le type de cible doit être "movie" ou "series"' });
+        }
+
+        // Vérifier que la cible existe
+        const targetExists = target === 'movie'
+            ? await Movie.findById(targetId).exec()
+            : null; // Pour l'instant, on ne gère que les films
+
+        if (!targetExists) {
+            return res.status(404).json({ message: `${target === 'movie' ? 'Film' : 'Série'} non trouvé` });
+        }
+
+        // Calculer la moyenne des notes
+        const result = await Rating.aggregate([
+            {
+                $match: {
+                    target,
+                    targetId: new mongoose.Types.ObjectId(targetId)
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageScore: { $avg: '$score' },
+                    totalRatings: { $sum: 1 },
+                    scoreDistribution: {
+                        $push: '$score'
+                    }
+                }
+            }
+        ]);
+
+        const ratingData = result[0] || {
+            averageScore: 0,
+            totalRatings: 0,
+            scoreDistribution: []
+        };
+
+        // Calculer la distribution des notes
+        const distribution = ratingData.scoreDistribution.reduce((acc: any, score: number) => {
+            acc[score] = (acc[score] || 0) + 1;
+            return acc;
+        }, {});
+
+        return res.json({
+            message: 'Moyenne des notes récupérée avec succès',
+            data: {
+                target,
+                targetId,
+                averageScore: Math.round(ratingData.averageScore * 10) / 10,
+                totalRatings: ratingData.totalRatings,
+                distribution
+            }
+        });
+    } catch (error: any) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'ID invalide' });
+        }
+        return res.status(400).json({ message: error.message });
     }
 });
 
@@ -437,15 +673,21 @@ app.delete('/api/v2/ratings/:id', authenticateToken, async (req: any, res: any):
 // Fonction de connexion à MongoDB
 async function connectToMongoDB() {
     try {
-        console.log(' Connexion à MongoDB Atlas...');
-        await mongoose.connect(process.env.MONGO_URI!, {
+        const mongoUri = getMongoUri();
+        const env = isProduction ? 'Production (Cluster MongoDB)' : 'Development (MongoDB local)';
+        
+        console.log(` Connexion à MongoDB (${env})...`);
+        console.log(` URI: ${mongoUri.replace(/\/\/.*@/, '//***:***@')}`); // Masquer les credentials
+        
+        await mongoose.connect(mongoUri, {
             maxPoolSize: 10,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
         });
-        console.log(' Connexion à MongoDB Atlas réussie !');
+        
+        console.log(` Connexion à MongoDB réussie ! (${env})`);
         const dbName = mongoose.connection?.db?.databaseName || '(inconnue)';
-        console.log(' Base de données:', dbName);
+        console.log(` Base de données: ${dbName}`);
     } catch (error: any) {
         console.error(' Erreur de connexion MongoDB:', error.message);
         process.exit(1);
@@ -469,23 +711,38 @@ async function startServer() {
         await connectToMongoDB();
         
         app.listen(PORT, () => {
-            console.log(` Serveur TV Tracker v2 TypeScript démarré sur le port ${PORT}`);
-            console.log(` API disponible sur http://localhost:${PORT}`);
-            console.log(` Documentation Swagger: http://localhost:${PORT}/docs`);
-            console.log(` Environnement: ${process.env.NODE_ENV || 'development'}`);
+            const env = isProduction ? 'PRODUCTION' : 'DEVELOPMENT';
+            const protocol = isProduction ? 'https' : 'http';
+            const mongoEnv = isProduction ? 'Cluster MongoDB' : 'MongoDB local';
+            
+            console.log(`\n╔══════════════════════════════════════════════════════════╗`);
+            console.log(`║   Serveur TV Tracker API v2 démarré avec succès            ║`);
+            console.log(`╚══════════════════════════════════════════════════════════╝\n`);
+            console.log(` Environnement: ${env}`);
+            console.log(` Port: ${PORT}`);
+            console.log(` Base de données: ${mongoEnv}`);
+            console.log(` API disponible sur ${protocol}://localhost:${PORT}`);
+            console.log(` Documentation Swagger:`);
+            console.log(`   - v1 (deprecated): ${protocol}://localhost:${PORT}/docs/v1`);
+            console.log(`   - v2 (active):     ${protocol}://localhost:${PORT}/docs/v2`);
             console.log(`\n Endpoints disponibles :`);
-            console.log(`   POST /api/v2/auth/register  - Inscription`);
-            console.log(`   POST /api/v2/auth/login     - Connexion`);
-            console.log(`   GET  /api/v2/auth/me        - Profil (JWT requis)`);
-            console.log(`   GET  /api/v2/movies         - Liste des films`);
-            console.log(`   GET  /api/v2/movies/:id     - Film par ID`);
-            console.log(`   POST /api/v2/movies         - Créer un film (Admin, JWT requis)`);
-            console.log(`   PATCH /api/v2/movies/:id    - Mettre à jour un film (Admin, JWT requis)`);
-            console.log(`   DELETE /api/v2/movies/:id   - Supprimer un film (Admin, JWT requis)`);
-            console.log(`   POST /api/v2/ratings        - Créer une note (JWT requis)`);
-            console.log(`   PATCH /api/v2/ratings/:id   - Mettre à jour une note (Auteur ou Admin)`);
-            console.log(`   DELETE /api/v2/ratings/:id  - Supprimer une note (Auteur ou Admin)`);
-            console.log(`   GET  /api/v2/ratings/my     - Mes notes (JWT requis)`);
+            console.log(`   POST   /api/v2/auth/register          - Inscription`);
+            console.log(`   POST   /api/v2/auth/login               - Connexion`);
+            console.log(`   GET    /api/v2/auth/me                   - Profil (JWT requis)`);
+            console.log(`   GET    /api/v2/movies                   - Liste des films (pagination + filtres)`);
+            console.log(`   GET    /api/v2/movies/:id               - Film par ID`);
+            console.log(`   POST   /api/v2/movies                   - Créer un film (Admin, JWT requis)`);
+            console.log(`   PATCH  /api/v2/movies/:id               - Mettre à jour un film (Admin, JWT requis)`);
+            console.log(`   DELETE /api/v2/movies/:id               - Supprimer un film (Admin, JWT requis)`);
+            console.log(`   POST   /api/v2/ratings                  - Créer une note (JWT requis)`);
+            console.log(`   GET    /api/v2/ratings/my               - Mes notes (JWT requis, pagination)`);
+            console.log(`   GET    /api/v2/ratings/avg/:target/:id  - Moyenne des notes (film/série)`);
+            console.log(`   PATCH  /api/v2/ratings/:id               - Mettre à jour une note (Auteur ou Admin)`);
+            console.log(`   DELETE /api/v2/ratings/:id               - Supprimer une note (Auteur ou Admin)`);
+            console.log(`\n Sécurité:`);
+            console.log(`   - Rate limiting: ${isProduction ? 'Strict (50 req/15min)' : 'Permissif (100 req/15min)'}`);
+            console.log(`   - CORS: ${isProduction ? 'Restreint' : 'Permissif'}`);
+            console.log(`   - HTTPS: ${isProduction ? 'Activé (redirect)' : 'Désactivé'}`);
         });
     } catch (error: any) {
         console.error(' Erreur lors du démarrage:', error);

@@ -108,13 +108,34 @@ const sampleMovies: Array<Pick<IMovie, 'title' | 'genres' | 'synopsis' | 'releas
 
 async function seedDatabase(): Promise<void> {
     try {
-        console.log('🔄 Connexion à MongoDB...');
-        const mongoUri = process.env.MONGO_URI;
+        // Utiliser la même logique que server-fixed.ts pour choisir la base de données
+        const isProduction = process.env.NODE_ENV === 'production';
+        const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+        
+        const getMongoUri = (): string => {
+            if (isProduction) {
+                return process.env.MONGO_URI_PROD || process.env.MONGO_URI || '';
+            } else {
+                return process.env.MONGO_URI_DEV || process.env.MONGO_URI || 'mongodb://localhost:27017/tv_tracker_v2_dev';
+            }
+        };
+        
+        const mongoUri = getMongoUri();
+        const env = isProduction ? 'PRODUCTION' : 'DEVELOPMENT';
+        const dbType = isProduction ? 'Cluster MongoDB' : 'MongoDB local/Cluster';
+        
+        console.log(`🔄 Connexion à MongoDB (${env})...`);
+        console.log(`📊 Environnement: ${env}`);
+        console.log(`💾 Type: ${dbType}`);
+        
         if (!mongoUri) {
-            throw new Error('MONGO_URI non définie');
+            throw new Error('MONGO_URI non définie. Vérifiez votre fichier env.local');
         }
+        
         await mongoose.connect(mongoUri);
-        console.log('✅ Connexion à MongoDB réussie');
+        const dbName = mongoose.connection?.db?.databaseName || '(inconnue)';
+        console.log(`✅ Connexion à MongoDB réussie`);
+        console.log(`📦 Base de données: ${dbName}`);
 
         // Nettoyer la base de données
         console.log('🧹 Nettoyage de la base de données...');

@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "TV Tracker API v2",
-        "description": "Collection Postman pour l'API RESTful TV Tracker v2",
+        "description": "Collection Postman complète pour l'API RESTful TV Tracker v2\n\n**Fonctionnalités :**\n- Authentification JWT (Register, Login, Profile)\n- Gestion des films (CRUD avec pagination et filtres)\n- Gestion des notes (CRUD avec pagination)\n- Moyenne des notes (films et séries)\n- Tests d'erreurs et rate limiting\n\n**Variables requises :**\n- `base_url` : http://localhost:3000\n- `jwt_token` : Rempli automatiquement après login\n- `movie_id` : Rempli automatiquement après création d'un film\n- `rating_id` : Rempli automatiquement après création d'une note\n\n**Utilisateurs de test (seed) :**\n- Admin: admin@tvtracker.com / admin123\n- User: user@tvtracker.com / user123",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "auth": {
@@ -34,6 +34,12 @@
             "key": "rating_id",
             "value": "",
             "type": "string"
+        },
+        {
+            "key": "target_id",
+            "value": "",
+            "type": "string",
+            "description": "ID de la cible (film ou série) pour les notes"
         }
     ],
     "item": [
@@ -213,15 +219,28 @@
             "name": "Movies",
             "item": [
                 {
-                    "name": "Get All Movies",
+                    "name": "Get All Movies (with Pagination)",
                     "request": {
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{base_url}}/api/v2/movies",
+                            "raw": "{{base_url}}/api/v2/movies?page=1&limit=10",
                             "host": ["{{base_url}}"],
-                            "path": ["api", "v2", "movies"]
-                        }
+                            "path": ["api", "v2", "movies"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Numéro de page"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Nombre d'éléments par page"
+                                }
+                            ]
+                        },
+                        "description": "Récupère la liste des films avec pagination. Retourne: {items, pagination: {page, limit, total, pages}}"
                     }
                 },
                 {
@@ -349,7 +368,7 @@
             "name": "Ratings",
             "item": [
                 {
-                    "name": "Create Rating",
+                    "name": "Create Rating (Movie)",
                     "event": [
                         {
                             "listen": "test",
@@ -381,11 +400,49 @@
                             "raw": "{{base_url}}/api/v2/ratings",
                             "host": ["{{base_url}}"],
                             "path": ["api", "v2", "ratings"]
-                        }
+                        },
+                        "description": "Crée une note pour un film. Score: 1-10. JWT requis."
                     }
                 },
                 {
-                    "name": "Get Average Rating",
+                    "name": "Create Rating (Series)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201 || pm.response.code === 200) {",
+                                    "  const json = pm.response.json();",
+                                    "  const id = json.data ? json.data._id : (json._id || (json.rating && json.rating._id));",
+                                    "  if (id) pm.collectionVariables.set('rating_id', id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"target\": \"series\",\n  \"targetId\": \"{{target_id}}\",\n  \"score\": 9,\n  \"review\": \"Great series with compelling storyline.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v2/ratings",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v2", "ratings"]
+                        },
+                        "description": "Crée une note pour une série. Score: 1-10. JWT requis."
+                    }
+                },
+                {
+                    "name": "Get Average Rating (Movie)",
                     "request": {
                         "method": "GET",
                         "header": [],
@@ -393,11 +450,25 @@
                             "raw": "{{base_url}}/api/v2/ratings/avg/movie/{{movie_id}}",
                             "host": ["{{base_url}}"],
                             "path": ["api", "v2", "ratings", "avg", "movie", "{{movie_id}}"]
-                        }
+                        },
+                        "description": "Récupère la moyenne des notes pour un film. Retourne: averageScore, totalRatings, distribution"
                     }
                 },
                 {
-                    "name": "Get My Ratings",
+                    "name": "Get Average Rating (Series)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v2/ratings/avg/series/{{movie_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v2", "ratings", "avg", "series", "{{movie_id}}"]
+                        },
+                        "description": "Récupère la moyenne des notes pour une série. Retourne: averageScore, totalRatings, distribution"
+                    }
+                },
+                {
+                    "name": "Get My Ratings (with Pagination)",
                     "request": {
                         "method": "GET",
                         "header": [],
@@ -408,14 +479,17 @@
                             "query": [
                                 {
                                     "key": "page",
-                                    "value": "1"
+                                    "value": "1",
+                                    "description": "Numéro de page"
                                 },
                                 {
                                     "key": "limit",
-                                    "value": "10"
+                                    "value": "10",
+                                    "description": "Nombre d'éléments par page"
                                 }
                             ]
-                        }
+                        },
+                        "description": "Récupère les notes de l'utilisateur connecté avec pagination. Retourne: {items, pagination: {page, limit, total, pages}}"
                     }
                 },
                 {
