@@ -1,372 +1,312 @@
-#  TV Tracker API v2 - Projet Final
+# TP1 — API RESTful TV Tracker
 
-API RESTful professionnelle pour la gestion de films et séries avec MongoDB, JWT, Swagger et configuration multi-environnement.
+## Description
+Ce projet implémente une API RESTful complète en TypeScript avec Node.js et Express pour la gestion d'un système de suivi de médias (films et séries). L'API respecte les spécifications du TP1 avec authentification, validation, logging et persistance des données.
 
-##  Démarrage Rapide
+## 🚀 Installation et Démarrage
 
-### 1. Installation des dépendances
+### Prérequis
+- Node.js (version 14 ou supérieure)
+- npm
+
+### Installation
 ```bash
+# Cloner le repository
+git clone <votre-repo-github>
+cd TP1_CollecteDeDonnes_AndyL_2025
+
+# Installer les dépendances
 npm install
 ```
 
-### 2. Configuration de l'environnement
-Copiez et configurez le fichier `env.local` :
+### Démarrage
 ```bash
-# Configuration de l'environnement
-NODE_ENV=development  # ou production
-
-# Configuration MongoDB
-MONGO_URI_DEV=mongodb://localhost:27017/tv_tracker_v2_dev  # Dev: MongoDB local
-MONGO_URI_PROD=mongodb+srv://user:password@cluster.mongodb.net/tv_tracker_v2  # Prod: Cluster MongoDB
-
-# Configuration JWT
-JWT_SECRET=your_super_secret_jwt_key_here
-
-# Configuration CORS
-CORS_ORIGIN=http://localhost:3000
-CORS_ORIGIN_PROD=https://yourdomain.com  # Production: CORS restreint
+# Démarrer le serveur en mode développement
+npm run start
 ```
 
-### 3. Démarrage du serveur
+Le serveur sera accessible sur `http://localhost:3000`
 
-**Développement (MongoDB local) :**
-```bash
-npm run dev
+## 📁 Structure du Projet
+
 ```
-# Doit retourner {"status":"ok","database":"connected"}
-
-**Production (Cluster MongoDB) :**
-```bash
-npm run prod
+src/
+├── controllers/          # Contrôleurs de l'API
+│   ├── MediaController.ts
+│   ├── FilmController.ts
+│   ├── SerieController.ts
+│   ├── SaisonController.ts
+│   ├── EpisodeController.ts
+│   └── LogController.ts
+├── models/              # Modèles POO
+│   ├── Media.ts         # Classe abstraite
+│   ├── Film.ts          # Hérite de Media
+│   ├── Serie.ts         # Hérite de Media
+│   ├── Saison.ts        # Contient des épisodes
+│   ├── Episode.ts       # Épisode individuel
+│   └── User.ts          # Utilisateur
+├── routes/              # Définition des routes
+│   ├── medias.routes.ts
+│   ├── films.routes.ts
+│   ├── series.routes.ts
+│   ├── seasons.routes.ts
+│   ├── episodes.routes.ts
+│   └── logs.routes.ts
+├── middlewares/         # Middlewares personnalisés
+│   ├── auth.middleware.ts      # Authentification et autorisation
+│   ├── validation.middleware.ts # Validation des données
+│   └── error.middleware.ts     # Gestion des erreurs
+├── services/            # Services métier
+│   ├── StorageService.ts       # Persistance des données
+│   └── LoggerService.ts        # Logging avec Winston
+├── data/                # Données persistantes
+│   └── db.json          # Base de données JSON
+└── logs/                # Fichiers de logs
+    ├── operations.log   # Logs des opérations
+    └── errors.log       # Logs des erreurs
 ```
 
-### 4. Peupler la base de données
-```bash
-# Peupler la base de développement
-npm run seed
+## 🔌 API Endpoints
 
-# Peupler la base de production
-npm run seed:prod
-```
+### Base
+- `GET /` - Informations sur l'API et endpoints disponibles
 
-### 5. Accès à l'API
-- **API** : http://localhost:3000
-- **Swagger v1 (deprecated)** : http://localhost:3000/docs/v1
-- **Swagger v2 (active)** : http://localhost:3000/docs/v2
-- **Health check** : http://localhost:3000/health
-
-## 📊 Configuration des Environnements
-
-### Développement (Development)
-- **Base de données** : MongoDB local (`mongodb://localhost:27017/tv_tracker_v2_dev`)
-- **CORS** : Permissif (`http://localhost:3000`)
-- **Rate limiting** : 100 requêtes / 15 minutes
-- **HTTPS** : Désactivé
-
-### Production
-- **Base de données** : Cluster MongoDB Atlas (`tv_tracker_v2`)
-- **CORS** : Restreint (configuré via `CORS_ORIGIN_PROD`)
-- **Rate limiting** : 50 requêtes / 15 minutes
-- **HTTPS** : Redirect activé (si `HTTPS_ENABLED=true`)
-
-## 🎯 Endpoints API
-
-### Authentification
-- `POST /api/v2/auth/register` - Inscription (rate limit: 5 req/15min)
-- `POST /api/v2/auth/login` - Connexion (rate limit: 5 req/15min)
-- `GET /api/v2/auth/me` - Profil (JWT requis)
+### Médias (Routes principales)
+- `GET /api/medias` - Liste tous les médias (avec filtres optionnels)
+  - Query params: `type` (film|serie), `genre`, `year`
+- `GET /api/medias/:id` - Récupère un média par ID
+- `POST /api/medias` - Crée un nouveau média (admin seulement)
+- `PUT /api/medias/:id` - Met à jour un média (admin seulement)
+- `DELETE /api/medias/:id` - Supprime un média (admin seulement)
 
 ### Films
-- `GET /api/v2/movies` - Liste des films avec **pagination et filtres**
-  - Query params: `title`, `genre`, `minYear`, `maxYear`, `minDuration`, `maxDuration`, `page`, `limit`
-  - Réponse: `{items, pagination: {page, limit, total, pages}}`
-- `GET /api/v2/movies/:id` - Détails d'un film
-- `POST /api/v2/movies` - Créer un film (Admin, JWT requis)
-- `PATCH /api/v2/movies/:id` - Modifier un film (Admin, JWT requis)
-- `DELETE /api/v2/movies/:id` - Supprimer un film (Admin, JWT requis)
+- `POST /api/films` - Crée un nouveau film (admin seulement)
 
-### Notes (Ratings)
-- `POST /api/v2/ratings` - Créer une note (JWT requis)
-  - Body: `{target: 'movie'|'series', targetId: string, score: 1-10, review?: string}`
-- `GET /api/v2/ratings/my` - Mes notes avec **pagination** (JWT requis)
-  - Query params: `page`, `limit`
-  - Réponse: `{items, pagination: {page, limit, total, pages}}`
-- `GET /api/v2/ratings/avg/:target/:targetId` - Moyenne des notes d'un film/série
-  - Réponse: `{averageScore, totalRatings, distribution}`
-- `PATCH /api/v2/ratings/:id` - Modifier une note (Auteur ou Admin, JWT requis)
-- `DELETE /api/v2/ratings/:id` - Supprimer une note (Auteur ou Admin, JWT requis)
+### Séries
+- `POST /api/series` - Crée une nouvelle série (admin seulement)
 
-##  Documentation Swagger Interactive
+### Saisons
+- `POST /api/seasons` - Crée une nouvelle saison (admin seulement)
 
-### Accès à la Documentation
-1. **Démarrez le serveur** : `npm run dev` ou `npm run prod`
-2. **Ouvrez votre navigateur** :
-   - **v1 (deprecated)** : http://localhost:3000/docs/v1
-   - **v2 (active)** : http://localhost:3000/docs/v2
+### Épisodes
+- `POST /api/episodes` - Crée un nouvel épisode (admin seulement)
+- `PATCH /api/episodes/:id` - Met à jour un épisode (admin seulement)
 
-### Utilisation de l'Authentification dans Swagger
-1. **Inscription** : `POST /api/v2/auth/register`
-2. **Connexion** : `POST /api/v2/auth/login`
-3. **Copiez le token** retourné dans la réponse
-4. **Dans Swagger** : Cliquez sur "Authorize" → "bearerAuth" → Collez le token
-5. **Testez les endpoints protégés** avec "Try it out"
+### Routes spéciales
+- `GET /api/series/:id/episodes` - Récupère tous les épisodes d'une série
+- `GET /api/users/:id/medias` - Récupère tous les médias d'un utilisateur
+- `GET /api/logs` - Récupère la dernière opération depuis operations.log
 
-### Fonctionnalités Swagger
-- ✅ **v1 (deprecated)** : Marqué comme deprecated, route `getAll` testable
-- ✅ **v2 (active)** : Toutes les routes documentées
-- ✅ **Schémas complets** : User, Movie, Rating, Pagination, Error
-- ✅ **Propriété score** : Documentée avec min/max (1-10), exemples
-- ✅ **Validations** : Toutes les validations documentées (required, min, max, etc.)
-- ✅ **Routes protégées** : `bearerAuth` configuré, testable dans Swagger
-- ✅ **Pagination** : Format `{items, total, page, pages}` documenté
-- ✅ **Filtres** : Tous les filtres de recherche documentés
+## 🔐 Authentification et Autorisation
 
-##  Schémas MongoDB (Mongoose)
+### Header d'authentification
+L'API utilise le header `x-user-id` pour l'authentification :
 
-### Modèles Disponibles
+```bash
+# Pour les opérations admin
+curl -H "x-user-id: admin-001" http://localhost:3000/api/medias
 
-#### User (Authentification)
+# Pour les opérations utilisateur
+curl -H "x-user-id: user-001" http://localhost:3000/api/medias
+```
+
+### Rôles utilisateur
+- **admin** : Peut créer, modifier et supprimer des médias
+- **user** : Peut seulement consulter les médias
+
+### Utilisateurs de test
+- `admin-001` : Administrateur (rôle admin)
+- `user-001` : Utilisateur Test (rôle user)
+- `user-002` : Alice Martin (rôle user)
+
+## 📊 Modèles de Données
+
+### Media (abstrait)
 ```typescript
 {
-  email: string;           // Email unique
-  username: string;        // Nom d'utilisateur unique
-  password: string;        // Mot de passe hashé (bcrypt)
-  role: 'admin' | 'user';  // Rôle utilisateur
+  id: string;
+  titre: string;
+  plateforme: string;
+  userId: string;
 }
 ```
 
-#### Movie (Films)
+### Film (hérite de Media)
 ```typescript
 {
-  title: string;           // Titre du film
-  genres: string[];        // Genres du film
-  synopsis?: string;       // Synopsis (optionnel)
-  releaseDate?: Date;      // Date de sortie (optionnel)
-  durationMin: number;     // Durée en minutes
+  id: string;
+  titre: string;
+  plateforme: string;
+  userId: string;
+  duree: number;        // en minutes
+  genre: string;
+  annee: number;
 }
 ```
 
-#### Rating (Notes)
+### Serie (hérite de Media)
 ```typescript
 {
-  userId: ObjectId;         // Référence vers l'utilisateur
-  target: 'movie' | 'series'; // Type de cible
-  targetId: ObjectId;      // ID de la cible
-  score: number;           // Note (1-10) - Validation: min: 1, max: 10
-  review?: string;         // Avis (optionnel, max 1000 caractères)
+  id: string;
+  titre: string;
+  plateforme: string;
+  userId: string;
+  statut: "en_attente" | "en_cours" | "terminee";
+  saisons: Saison[];
 }
 ```
 
-### Index MongoDB Optimisés
-```javascript
-// Index sur les titres pour la recherche
-{ title: "text" }
-
-// Index sur les genres pour le filtrage
-{ genres: 1 }
-
-// Index sur les relations
-{ userId: 1, targetId: 1 }  // Unique pour éviter les doublons
-{ target: 1, targetId: 1 }  // Pour les moyennes
+### Saison
+```typescript
+{
+  numero: number;
+  episodes: Episode[];
+}
 ```
 
-##  Scripts de Seed
+### Episode
+```typescript
+{
+  id: string;
+  titre: string;
+  numero: number;
+  duree: number;        // en minutes
+  watched?: boolean;
+}
+```
 
-### Script TypeScript Principal
+### User
+```typescript
+{
+  id: string;
+  nom: string;
+  role: "admin" | "user";
+}
+```
+
+## ✅ Validation des Données
+
+L'API valide automatiquement les données selon les règles suivantes :
+
+| Champ | Règle | Exemple |
+|-------|-------|---------|
+| **titre** | `^[A-Za-z0-9 ]+$` | "Inception", "Breaking Bad" |
+| **plateforme** | `^[A-Za-z]+$` | "Netflix", "HBO" |
+| **duree** | Entier positif | 148, 45 |
+| **statut** | `en_attente\|en_cours\|terminee` | "en_cours" |
+| **annee** | ≤ année actuelle | 2023, 2010 |
+
+Les requêtes avec des données invalides retournent un code 400 avec les détails des erreurs.
+
+## 📝 Logging
+
+### Configuration Winston
+- **operations.log** : Logs des opérations (format JSON)
+- **errors.log** : Logs des erreurs (format JSON)
+- **Console** : Affichage coloré pour le développement
+
+### Format des logs
+```json
+{
+  "level": "info",
+  "message": "Operation",
+  "action": "CREATE_FILM",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "filmId": "film-001",
+  "userId": "admin-001"
+}
+```
+
+## 💾 Persistance des Données
+
+### Fichiers de données
+- **`src/data/db.json`** : Base de données JSON principale
+- **`src/logs/operations.log`** : Historique des opérations
+- **`src/logs/errors.log`** : Historique des erreurs
+
+### Garanties
+- ✅ Écriture automatique sur `db.json` après chaque mutation
+- ✅ Sauvegarde atomique (tout ou rien)
+- ✅ Gestion des erreurs de persistance
+
+## 🧪 Données de Test
+
+Le fichier `db.json` contient des données de test prêtes à l'emploi :
+
+### Films
+- **Inception** (2010) - Science Fiction - 148 min
+- **The Dark Knight** (2008) - Action - 152 min
+
+### Séries
+- **Breaking Bad** - Terminée - 2 saisons avec épisodes
+- **Stranger Things** - En cours - 1 saison avec épisodes
+
+### Utilisateurs
+- 1 administrateur
+- 2 utilisateurs normaux
+
+## 🔧 Exemples d'Utilisation
+
+### Créer un film (admin)
 ```bash
-# Peupler la base de développement
-npm run seed
-
-# Peupler la base de production
-npm run seed:prod
+curl -X POST http://localhost:3000/api/films \
+  -H "Content-Type: application/json" \
+  -H "x-user-id: admin-001" \
+  -d '{
+    "titre": "Interstellar",
+    "plateforme": "Netflix",
+    "duree": 169,
+    "genre": "Science Fiction",
+    "annee": 2014,
+    "userId": "user-001"
+  }'
 ```
 
-**Fichier** : `seed-simple.ts`
-
-**Fonctionnalités** :
-- Détection automatique de l'environnement (dev/prod)
-- Utilise la même logique que `server-fixed.ts` pour choisir la base de données
-- Création d'utilisateurs (admin et user)
-- Films avec genres et métadonnées
-- Notes et avis utilisateurs
-- Nettoyage automatique avant peuplement
-
-### Données de Test Créées
-- **Utilisateurs** : 
-  - `admin@tvtracker.com` / `admin123` (role: admin)
-  - `user@tvtracker.com` / `user123` (role: user)
-- **Films** : 5 films populaires (Avatar, Interstellar, The Matrix, Forrest Gump, Le Seigneur des Anneaux)
-- **Notes** : 10 notes (2 par film)
-
-## 🔧 Configuration
-
-### Variables d'Environnement (`env.local`)
+### Lister les médias avec filtres
 ```bash
-# Environnement
-NODE_ENV=development  # ou production
+# Tous les films
+curl "http://localhost:3000/api/medias?type=film"
 
-# MongoDB
-MONGO_URI_DEV=mongodb://localhost:27017/tv_tracker_v2_dev
-MONGO_URI_PROD=mongodb+srv://user:password@cluster.mongodb.net/tv_tracker_v2
+# Films de science fiction
+curl "http://localhost:3000/api/medias?type=film&genre=Science Fiction"
 
-# JWT
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=7d
-
-# CORS
-CORS_ORIGIN=http://localhost:3000
-CORS_ORIGIN_PROD=https://yourdomain.com
-
-# Rate Limiting
-RATE_LIMIT_WINDOW_MS=900000  # 15 minutes
-RATE_LIMIT_MAX_REQUESTS=100
-RATE_LIMIT_AUTH_WINDOW_MS=900000
-RATE_LIMIT_AUTH_MAX=5
-
-# HTTPS (production)
-HTTPS_ENABLED=false
+# Films de 2010
+curl "http://localhost:3000/api/medias?type=film&year=2010"
 ```
 
-## 🛡️ Sécurité
-
-### JWT (JSON Web Tokens)
-- **Expiration** : 7 jours (dev) / 1 jour (prod)
-- **Secret** : Configuré via `JWT_SECRET`
-- **Format** : `Bearer <token>`
-
-### Rôles
-- **Admin** : Accès complet (CRUD films, gestion utilisateurs)
-- **User** : Lecture + création/modification de ses propres notes
-
-### Rate Limiting
-- **Général** : 100 req/15min (dev) / 50 req/15min (prod)
-- **Authentification** : 5 tentatives / 15 minutes
-- **Headers** : `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `Retry-After`
-
-### CORS
-- **Development** : Permissif (`http://localhost:3000`)
-- **Production** : Restreint (configuré via `CORS_ORIGIN_PROD`)
-
-### HTTPS
-- **Production** : Redirect automatique HTTP → HTTPS (si `HTTPS_ENABLED=true`)
-- **Localhost** : Désactivé automatiquement (même en production)
-
-### Helmet
-- Headers de sécurité configurés
-- Content Security Policy
-- Protection contre XSS, clickjacking, etc.
-
-##  Structure du Projet
-
-```
-├── server-fixed.ts          # Serveur principal (utilisé)
-├── seed-simple.ts           # Script de seed
-├── package.json             # Dépendances et scripts
-├── env.local                # Variables d'environnement (non commité)
-├── tsconfig.json            # Configuration TypeScript
-├── v1/                      # Version 1 (dépréciée)
-│   ├── src/
-│   └── package.json
-├── v2/                      # Version 2 (active)
-│   ├── src/
-│   │   ├── models/          # Schémas Mongoose
-│   │   ├── controllers/     # Contrôleurs
-│   │   ├── routes/          # Routes Express
-│   │   ├── middlewares/     # Middlewares
-│   │   └── services/        # Services
-│   ├── config/              # Configuration multi-env
-│   ├── docs/                # Documentation Swagger
-│   │   ├── swagger-v1.json  # v1 (deprecated)
-│   │   └── swagger-v2.json  # v2 (active)
-│   └── collections_postman/ # Collections Postman
-│       ├── TV_Tracker_API_Collection.postman_collection.json
-│       └── TV_Tracker_API_v2_Collection.postman_collection.json
-└── README.md                # Ce fichier
-```
-
-##  Tests
-
-### Test de l'API
+### Récupérer la dernière opération
 ```bash
-# Test de santé
-curl http://localhost:3000/health
-
-# Test de l'endpoint racine
-curl http://localhost:3000/
-
-# Test avec pagination
-curl "http://localhost:3000/api/v2/movies?page=1&limit=5"
-
-# Test avec filtres
-curl "http://localhost:3000/api/v2/movies?title=Avatar&genre=Action"
+curl http://localhost:3000/api/logs
 ```
 
-### Test avec Postman
-1. **Import** : `v2/collections_postman/TV_Tracker_API_v2_Collection.postman_collection.json`
-2. **Variables** : Configurer `{{baseUrl}}` = `http://localhost:3000`
-3. **Authentification** : Exécuter "Register" ou "Login" pour obtenir le token
-4. **Tests** : Exécuter la collection complète avec tests automatiques
+## 🚨 Gestion des Erreurs
 
-##  Commandes Utiles
+L'API retourne des codes d'erreur appropriés :
 
-```bash
-# Développement (MongoDB local)
-npm run dev
+- **400** : Données de validation invalides
+- **401** : Non autorisé (header x-user-id manquant)
+- **403** : Accès interdit (rôle insuffisant)
+- **404** : Ressource non trouvée
+- **500** : Erreur interne du serveur
 
-# Production (Cluster MongoDB)
-npm run prod
+## 📋 Checklist TP1
 
-# Peupler la base de données
-npm run seed          # Dev
-npm run seed:prod     # Prod
+- ✅ **Dépendances** : express, winston, typescript, ts-node-dev, @types/*
+- ✅ **Modèles POO** : Media (abstrait), Film, Serie, Saison, Episode, User
+- ✅ **Persistence** : StorageService avec CRUD et écriture sur db.json
+- ✅ **Validation** : Middleware avec regex selon spécifications
+- ✅ **Auth** : Middleware x-user-id et requireAdmin
+- ✅ **Logger** : Winston avec operations.log, errors.log, console
+- ✅ **Endpoint logs** : GET /api/logs retourne dernière action
+- ✅ **Routes** : Toutes les routes spécifiées + routes additionnelles
+- ✅ **Données test** : db.json avec admin, films, séries, épisodes
+- ✅ **Documentation** : README complet avec exemples
 
-# Build TypeScript
-npm run build
+## 👨‍💻 Auteur
 
-# Tests
-npm run test:typescript
-```
+**Andy L.** - TP1 Collecte et Interprétation des Données  
+Automne 2025
 
-## 📋 Checklist des Fonctionnalités
-
-### ✅ Documentation OpenAPI
-- [x] v1 (Swagger) : deprecated + route getAll testable
-- [x] v2 (Swagger) : toutes les routes documentées
-- [x] UI : `/docs/v1` & `/docs/v2` routes documentées
-- [x] V2 : schémas complets (montrer les schémas + explorer la propriété score pour rating)
-- [x] Les validations implémentées et documentées
-- [x] Routes protégées sur swagger : bearerAuth + tester un accès à une route protégée sans authentification
-- [x] Tester exemple avec user (route sans autorisation + une avec autorisation)
-- [x] Créer 2 ratings pour un film (avec 1 ou 2 users)
-- [x] Tester exemple avec admin
-- [x] Montrer et tester une route avec la pagination et les filtres (montrer {items,total,page,pages} dans le résultat)
-- [x] Moyenne film ou moyenne série
-
-### ✅ Sécurité (JWT, rôles, CORS, rate-limit, HTTPS)
-- [x] CORS restreint (production)
-- [x] Rate-limit (général + authentification)
-- [x] HTTPS prod (redirect activé si configuré)
-
-### ✅ Environnements
-- [x] Dev : MongoDB local (ou cluster avec base `tv_tracker_v2_dev`)
-- [x] Prod : Cluster MongoDB (base `tv_tracker_v2`)
-- [x] Scripts npm : `dev`, `prod`, `seed`, `seed:prod`
-
-## 🎉 Projet Prêt !
-
-**Le serveur est opérationnel avec :**
-- ✅ MongoDB connecté (dev/prod séparés)
-- ✅ Documentation Swagger interactive (v1 + v2)
-- ✅ Authentification JWT complète
-- ✅ Sécurité complète (CORS, rate-limit, HTTPS, Helmet)
-- ✅ Scripts de seed fonctionnels
-- ✅ Configuration multi-environnement
-- ✅ Pagination et filtres
-- ✅ Moyenne des notes
-
----
+## 📄 Licence
 
 Ce projet est développé dans le cadre académique du cours de Collecte et Interprétation des Données.
-
-**Auteur** : Andy L  
-**Version** : 2.0.0
